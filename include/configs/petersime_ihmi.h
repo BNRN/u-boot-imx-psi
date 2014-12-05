@@ -46,7 +46,7 @@
 #endif
 
 #define CONFIG_MXC_UART
-#define CONFIG_MXC_UART_BASE	       UART2_BASE
+#define CONFIG_MXC_UART_BASE	       UART1_BASE
 
 #define CONFIG_CMD_SF
 #ifdef CONFIG_CMD_SF
@@ -130,16 +130,16 @@
 #define CONFIG_SYS_USB_EVENT_POLL_VIA_CONTROL_EP
 
 /* Miscellaneous commands */
-#define CONFIG_CMD_BMODE
+/* #define CONFIG_CMD_BMODE */
 #define CONFIG_CMD_SETEXPR
 
+#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE
 /* Framebuffer and LCD */
-#define CONFIG_VIDEO
+/* #define CONFIG_VIDEO
 #define CONFIG_VIDEO_IPUV3
 #define CONFIG_CFB_CONSOLE
 #define CONFIG_VGA_AS_SINGLE_DEVICE
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV
-#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE
 #define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_SPLASH_SCREEN
 #define CONFIG_BMP_16BPP
@@ -147,7 +147,7 @@
 #define CONFIG_CMD_HDMIDETECT
 #define CONFIG_CONSOLE_MUX
 #define CONFIG_IMX_HDMI
-#define CONFIG_IMX_VIDEO_SKIP
+#define CONFIG_IMX_VIDEO_SKIP */
 
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
@@ -161,7 +161,7 @@
 
 #define CONFIG_BOOTDELAY	       1
 
-#define CONFIG_PREBOOT                 ""
+/* #define CONFIG_PREBOOT                 "" */
 
 #define CONFIG_LOADADDR			       0x12000000
 #define CONFIG_SYS_TEXT_BASE	       0x17800000
@@ -382,7 +382,7 @@
 #define CONFIG_CMD_CACHE
 #endif
 
-#define CONFIG_CMD_BMP
+/* #define CONFIG_CMD_BMP */
 
 #define CONFIG_CMD_TIME
 #define CONFIG_CMD_MEMTEST

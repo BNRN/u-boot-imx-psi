@@ -28,6 +28,8 @@
 #include <asm/arch/crm_regs.h>
 #include <asm/arch/mxc_hdmi.h>
 #include <i2c.h>
+#include <power/pmic.h>
+#include <power/pfuze100_pmic.h>
 #include <input.h>
 #include <netdev.h>
 #include <usb/ehci-fsl.h>
@@ -66,6 +68,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define OUTPUT_40OHM (PAD_CTL_SPEED_MED|PAD_CTL_DSE_40ohm)
 
+
 int dram_init(void)
 {
 	gd->ram_size = ((ulong)CONFIG_DDR_MB * 1024 * 1024);
@@ -86,7 +89,7 @@ static iomux_v3_cfg_t const uart2_pads[] = {
 #define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
 
 /* I2C1, SGTL5000 */
-static struct i2c_pads_info i2c_pad_info0 = {
+/*static struct i2c_pads_info i2c_pad_info0 = {
 	.scl = {
 		.i2c_mode = MX6_PAD_EIM_D21__I2C1_SCL | PC,
 		.gpio_mode = MX6_PAD_EIM_D21__GPIO3_IO21 | PC,
@@ -97,9 +100,9 @@ static struct i2c_pads_info i2c_pad_info0 = {
 		.gpio_mode = MX6_PAD_EIM_D28__GPIO3_IO28 | PC,
 		.gp = IMX_GPIO_NR(3, 28)
 	}
-};
+};*/
 
-/* I2C2 Camera, MIPI */
+/* I2C2 PMIC */
 static struct i2c_pads_info i2c_pad_info1 = {
 	.scl = {
 		.i2c_mode = MX6_PAD_KEY_COL3__I2C2_SCL | PC,
@@ -114,7 +117,7 @@ static struct i2c_pads_info i2c_pad_info1 = {
 };
 
 /* I2C3, J15 - RGB connector */
-static struct i2c_pads_info i2c_pad_info2 = {
+/*static struct i2c_pads_info i2c_pad_info2 = {
 	.scl = {
 		.i2c_mode = MX6_PAD_GPIO_5__I2C3_SCL | PC,
 		.gpio_mode = MX6_PAD_GPIO_5__GPIO1_IO05 | PC,
@@ -125,7 +128,7 @@ static struct i2c_pads_info i2c_pad_info2 = {
 		.gpio_mode = MX6_PAD_GPIO_16__GPIO7_IO11 | PC,
 		.gp = IMX_GPIO_NR(7, 11)
 	}
-};
+};*/
 
 static iomux_v3_cfg_t const usdhc3_pads[] = {
 	MX6_PAD_SD3_CLK__SD3_CLK   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -903,6 +906,26 @@ int overwrite_console(void)
 	return 1;
 }
 
+static int pfuze_init(void)
+{
+	struct pmic *p;
+	int ret;
+	unsigned int reg;
+
+	ret = power_pfuze100_init(1);
+	if (ret)
+		return ret;
+
+	p = pmic_get("PFUZE100");
+	ret = pmic_probe(p);
+	if (ret)
+		return ret;
+
+	pmic_reg_read(p, PFUZE100_DEVICEID, &reg);
+	printf("PMIC:  PFUZE100 ID=0x%02x\n", reg);
+	return 0;
+}
+
 int board_init(void)
 {
 	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
@@ -921,13 +944,15 @@ int board_init(void)
 #endif
 	// imx_iomux_v3_setup_multiple_pads(
 		// usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0);
-	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
-	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
+	//setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0);
+	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1); // PMIC
+	//setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
 
 #ifdef CONFIG_CMD_SATA
 	setup_sata();
 #endif
+
+    pfuze_init();
 
 	return 0;
 }

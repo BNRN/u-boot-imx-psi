@@ -212,6 +212,41 @@ static struct phy_driver ksz9031_driver = {
 	.readext = &ksz9031_phy_extread,
 };
 
+#ifdef CONFIG_PHY_MICREL_KSZ8873
+
+/*
+   KSZ8873 is in fact a switch
+   we always have a link to the switch 100 Mbit  Full Duplex through MAC3 
+*/
+static int ksz8873_config(struct phy_device *phydev)
+{
+	return 0;
+}
+
+static int ksz8873_startup(struct phy_device *phydev)
+{
+    phydev->speed = SPEED_100;
+    phydev->duplex = DUPLEX_FULL;
+	return 0;
+}
+
+static int ksz8873_shutdown(struct phy_device *phydev)
+{	
+	return 0;
+}
+
+static struct phy_driver ksz8873_driver = {
+	.name = "Micrel KSZ8873",
+	.uid = 0x221430,
+	.mask = 0xfffff0,
+	.features = PHY_BASIC_FEATURES,
+	.config = &ksz8873_config,
+	.startup = &ksz8873_startup,
+	.shutdown = &ksz8873_shutdown,
+};
+#endif
+
+
 int phy_micrel_init(void)
 {
 	phy_register(&KSZ804_driver);
@@ -221,5 +256,9 @@ int phy_micrel_init(void)
 	phy_register(&KS8721_driver);
 #endif
 	phy_register(&ksz9031_driver);
+#ifdef CONFIG_PHY_MICREL_KSZ8873
+	phy_register(&ksz8873_driver);
+#endif	
+	
 	return 0;
 }

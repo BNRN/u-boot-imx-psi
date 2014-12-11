@@ -1,3 +1,3 @@
-CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=board/psicontrol/petersime_ihmi/petersime_ihmi.cfg,MX6S,DDR_MB=1024"
+CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=board/psicontrol/petersime_ihmi/petersime_ihmi.cfg,MX6S,PETERSIME_IHMI,DDR_MB=1024"
 CONFIG_ARM=y
 CONFIG_TARGET_PETERSIME_IHMI=y

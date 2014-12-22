@@ -311,6 +311,8 @@ ehci_submit_async(struct usb_device *dev, unsigned long pipe, void *buffer,
 	uint32_t c, toggle;
 	uint32_t cmd;
 	int timeout;
+	int ehcitimedoutontd = 0;
+	uint32_t timedouttoken = 0;
 	int ret = 0;
 	struct ehci_ctrl *ctrl = dev->controller;
 
@@ -596,9 +598,10 @@ ehci_submit_async(struct usb_device *dev, unsigned long pipe, void *buffer,
 		ALIGN((uint32_t)buffer + length, ARCH_DMA_MINALIGN));
 
 	/* Check that the TD processing happened */
-	if (QT_TOKEN_GET_STATUS(token) & QT_TOKEN_STATUS_ACTIVE)
-		printf("EHCI timed out on TD - token=%#x\n", token);
-
+	if (QT_TOKEN_GET_STATUS(token) & QT_TOKEN_STATUS_ACTIVE) {
+		ehcitimedoutontd = 1;
+		timedouttoken = token;
+	}
 	/* Disable async schedule. */
 	cmd = ehci_readl(&ctrl->hcor->or_usbcmd);
 	cmd &= ~CMD_ASE;
@@ -623,6 +626,8 @@ ehci_submit_async(struct usb_device *dev, unsigned long pipe, void *buffer,
 			dev->status = 0;
 			break;
 		case QT_TOKEN_STATUS_HALTED:
+		    debug("status token STALLED\n");
+		    ehcitimedoutontd = 0;
 			dev->status = USB_ST_STALLED;
 			break;
 		case QT_TOKEN_STATUS_ACTIVE | QT_TOKEN_STATUS_DATBUFERR:
@@ -651,6 +656,10 @@ ehci_submit_async(struct usb_device *dev, unsigned long pipe, void *buffer,
 	}
 
 	free(qtd);
+
+	if (ehcitimedoutontd) {
+		printf("EHCI timed out on TD - token=%#x\n", timedouttoken);
+    }
 	return (dev->status != USB_ST_NOT_PROC) ? 0 : -1;
 
 fail:

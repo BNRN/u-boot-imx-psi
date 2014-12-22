@@ -45,6 +45,7 @@
 static struct usb_device usb_dev[USB_MAX_DEVICE];
 static int dev_index;
 static int asynch_allowed;
+static int usblowlevelinitok[CONFIG_USB_MAX_CONTROLLER_COUNT];
 
 char usb_started; /* flag for the started/stopped USB status */
 
@@ -74,6 +75,7 @@ int usb_init(void)
 
 	/* init low_level USB */
 	for (i = 0; i < CONFIG_USB_MAX_CONTROLLER_COUNT; i++) {
+		usblowlevelinitok[i] = 0;
 		/* init low_level USB */
 		printf("USB%d:   ", i);
 		ret = usb_lowlevel_init(i, USB_INIT_HOST, &ctrl);
@@ -107,6 +109,7 @@ int usb_init(void)
 				dev_index - start_index);
 
 		usb_started = 1;
+		usblowlevelinitok[i] = 1;
 	}
 
 	debug("scan end\n");
@@ -132,8 +135,11 @@ int usb_stop(void)
 		usb_hub_reset();
 
 		for (i = 0; i < CONFIG_USB_MAX_CONTROLLER_COUNT; i++) {
-			if (usb_lowlevel_stop(i))
-				printf("failed to stop USB controller %d\n", i);
+			/* only stop an usb controller that was initialized */
+			if (usblowlevelinitok[i]) {
+				if (usb_lowlevel_stop(i))
+					printf("failed to stop USB controller %d\n", i);
+			}
 		}
 	}
 

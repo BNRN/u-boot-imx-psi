@@ -203,9 +203,15 @@ static unsigned int usb_get_max_lun(struct us_data *us)
 			      0, us->ifnum,
 			      result, sizeof(char),
 			      USB_CNTL_TIMEOUT * 5);
+	/* check if request has been stalled */
+	if (us->pusb_dev->status & USB_ST_STALLED ) {
+	  debug("get_max_lun request has been stalled, return 0\n");
+	  return 0;
+  	}
 	debug("Get Max LUN -> len = %i, result = %i\n", len, (int) *result);
 	return (len > 0) ? *result : 0;
 }
+
 
 /*******************************************************************************
  * scan the usb and reports device info

@@ -27,7 +27,7 @@
 #define CONFIG_SYS_GENERIC_BOARD
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		(10 * 1024 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(100 * 1024 * 1024)
 
 #define CONFIG_BOARD_EARLY_INIT_F
 #define CONFIG_MISC_INIT_R
@@ -144,21 +144,25 @@
 /* #define CONFIG_CMD_BMODE */
 #define CONFIG_CMD_SETEXPR
 
-#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE
 /* Framebuffer and LCD */
-/* #define CONFIG_VIDEO
-#define CONFIG_VIDEO_IPUV3
-#define CONFIG_CFB_CONSOLE
-#define CONFIG_VGA_AS_SINGLE_DEVICE
-#define CONFIG_SYS_CONSOLE_IS_IN_ENV
+#define CONFIG_VIDEO /* enable video */
+#define CONFIG_VIDEO_IPUV3 /* enable i.MX6 video driver */
+#define CONFIG_CFB_CONSOLE /* set console on display */
+#define CONFIG_VGA_AS_SINGLE_DEVICE /* don't load keyboard driver , only display */
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV /* first say it can be in environment */
+#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE /* then overwrite it and say it's serial anyways */
 #define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_SPLASH_SCREEN
 #define CONFIG_BMP_16BPP
 #define CONFIG_IPUV3_CLK 260000000
-#define CONFIG_CMD_HDMIDETECT
+/* #define CONFIG_CMD_HDMIDETECT */
 #define CONFIG_CONSOLE_MUX
-#define CONFIG_IMX_HDMI
-#define CONFIG_IMX_VIDEO_SKIP */
+/* #define CONFIG_IMX_HDMI */
+#define CONFIG_IMX_VIDEO_SKIP
+
+#define CONFIG_PWM_IMX
+#define CONFIG_IMX6_PWM_PER_CLK	66000000
+
 
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE

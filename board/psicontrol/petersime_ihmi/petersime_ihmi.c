@@ -20,6 +20,7 @@
 #include <asm/imx-common/sata.h>
 #include <asm/imx-common/boot_mode.h>
 #include <asm/imx-common/video.h>
+#include <pwm.h>
 #include <mmc.h>
 #include <fsl_esdhc.h>
 #include <micrel.h>
@@ -180,7 +181,7 @@ static iomux_v3_cfg_t const misc_pads[] = {
 	MX6_PAD_GPIO_1__USB_OTG_ID		| MUX_PAD_CTRL(WEAK_PULLUP),
 	MX6_PAD_EIM_D21__USB_OTG_OC		| MUX_PAD_CTRL(WEAK_PULLUP),
 	/* OTG Power enable */
-	MX6_PAD_EIM_D22__GPIO3_IO22		| MUX_PAD_CTRL(OUTPUT_40OHM),
+	MX6_PAD_EIM_D22__GPIO3_IO22		| MUX_PAD_CTRL(OUTPUT_40OHM)
 };
 
 /* wl1271 pads on nitrogen6x */
@@ -420,51 +421,14 @@ static void setup_buttons(void)
 #if defined(CONFIG_VIDEO_IPUV3)
 
 static iomux_v3_cfg_t const backlight_pads[] = {
-	/* Backlight on RGB connector: J15 */
-	MX6_PAD_SD1_DAT3__GPIO1_IO21 | MUX_PAD_CTRL(NO_PAD_CTRL),
-#define RGB_BACKLIGHT_GP IMX_GPIO_NR(1, 21)
-
-	/* Backlight on LVDS connector: J6 */
-	MX6_PAD_SD1_CMD__GPIO1_IO18 | MUX_PAD_CTRL(NO_PAD_CTRL),
-#define LVDS_BACKLIGHT_GP IMX_GPIO_NR(1, 18)
+	/* Backlight on LVDS connector */
+    /* BL_EN */
+	MX6_PAD_DISP0_DAT10__GPIO4_IO31		| MUX_PAD_CTRL(OUTPUT_40OHM),
+#define LVDS_BACKLIGHT_GP IMX_GPIO_NR(4, 31)
+    /* PWM */
+	MX6_PAD_DISP0_DAT9__PWM2_OUT		| MUX_PAD_CTRL(WEAK_PULLUP)
+#define LVDS_BLACKLIGHT_PWM  1
 };
-
-static iomux_v3_cfg_t const rgb_pads[] = {
-	MX6_PAD_DI0_DISP_CLK__IPU1_DI0_DISP_CLK,
-	MX6_PAD_DI0_PIN15__IPU1_DI0_PIN15,
-	MX6_PAD_DI0_PIN2__IPU1_DI0_PIN02,
-	MX6_PAD_DI0_PIN3__IPU1_DI0_PIN03,
-	MX6_PAD_DI0_PIN4__GPIO4_IO20,
-	MX6_PAD_DISP0_DAT0__IPU1_DISP0_DATA00,
-	MX6_PAD_DISP0_DAT1__IPU1_DISP0_DATA01,
-	MX6_PAD_DISP0_DAT2__IPU1_DISP0_DATA02,
-	MX6_PAD_DISP0_DAT3__IPU1_DISP0_DATA03,
-	MX6_PAD_DISP0_DAT4__IPU1_DISP0_DATA04,
-	MX6_PAD_DISP0_DAT5__IPU1_DISP0_DATA05,
-	MX6_PAD_DISP0_DAT6__IPU1_DISP0_DATA06,
-	MX6_PAD_DISP0_DAT7__IPU1_DISP0_DATA07,
-	MX6_PAD_DISP0_DAT8__IPU1_DISP0_DATA08,
-	MX6_PAD_DISP0_DAT9__IPU1_DISP0_DATA09,
-	MX6_PAD_DISP0_DAT10__IPU1_DISP0_DATA10,
-	MX6_PAD_DISP0_DAT11__IPU1_DISP0_DATA11,
-	MX6_PAD_DISP0_DAT12__IPU1_DISP0_DATA12,
-	MX6_PAD_DISP0_DAT13__IPU1_DISP0_DATA13,
-	MX6_PAD_DISP0_DAT14__IPU1_DISP0_DATA14,
-	MX6_PAD_DISP0_DAT15__IPU1_DISP0_DATA15,
-	MX6_PAD_DISP0_DAT16__IPU1_DISP0_DATA16,
-	MX6_PAD_DISP0_DAT17__IPU1_DISP0_DATA17,
-	MX6_PAD_DISP0_DAT18__IPU1_DISP0_DATA18,
-	MX6_PAD_DISP0_DAT19__IPU1_DISP0_DATA19,
-	MX6_PAD_DISP0_DAT20__IPU1_DISP0_DATA20,
-	MX6_PAD_DISP0_DAT21__IPU1_DISP0_DATA21,
-	MX6_PAD_DISP0_DAT22__IPU1_DISP0_DATA22,
-	MX6_PAD_DISP0_DAT23__IPU1_DISP0_DATA23,
-};
-
-static void do_enable_hdmi(struct display_info_t const *dev)
-{
-	imx_enable_hdmi_phy();
-}
 
 static int detect_i2c(struct display_info_t const *dev)
 {
@@ -483,67 +447,10 @@ static void enable_lvds(struct display_info_t const *dev)
 	gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
 }
 
-static void enable_lvds_jeida(struct display_info_t const *dev)
-{
-	struct iomuxc *iomux = (struct iomuxc *)
-				IOMUXC_BASE_ADDR;
-	u32 reg = readl(&iomux->gpr[2]);
-	reg |= IOMUXC_GPR2_DATA_WIDTH_CH0_24BIT
-	     |IOMUXC_GPR2_BIT_MAPPING_CH0_JEIDA;
-	writel(reg, &iomux->gpr[2]);
-	gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
-}
-
-static void enable_rgb(struct display_info_t const *dev)
-{
-	imx_iomux_v3_setup_multiple_pads(
-		rgb_pads,
-		 ARRAY_SIZE(rgb_pads));
-	gpio_direction_output(RGB_BACKLIGHT_GP, 1);
-}
 
 struct display_info_t const displays[] = {{
-	.bus	= 1,
-	.addr	= 0x50,
-	.pixfmt	= IPU_PIX_FMT_RGB24,
-	.detect	= detect_i2c,
-	.enable	= do_enable_hdmi,
-	.mode	= {
-		.name           = "HDMI",
-		.refresh        = 60,
-		.xres           = 1024,
-		.yres           = 768,
-		.pixclock       = 15385,
-		.left_margin    = 220,
-		.right_margin   = 40,
-		.upper_margin   = 21,
-		.lower_margin   = 7,
-		.hsync_len      = 60,
-		.vsync_len      = 10,
-		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 0,
-	.addr	= 0,
-	.pixfmt	= IPU_PIX_FMT_RGB24,
-	.detect	= NULL,
-	.enable	= enable_lvds_jeida,
-	.mode	= {
-		.name           = "LDB-WXGA",
-		.refresh        = 60,
-		.xres           = 1280,
-		.yres           = 800,
-		.pixclock       = 14065,
-		.left_margin    = 40,
-		.right_margin   = 40,
-		.upper_margin   = 3,
-		.lower_margin   = 80,
-		.hsync_len      = 10,
-		.vsync_len      = 10,
-		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 0,
+
+/*	.bus	= 0,
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB24,
 	.detect	= NULL,
@@ -561,8 +468,7 @@ struct display_info_t const displays[] = {{
 		.hsync_len      = 10,
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
+		.vmode          = FB_VMODE_NONINTERLACED} }, {
 	.bus	= 2,
 	.addr	= 0x4,
 	.pixfmt	= IPU_PIX_FMT_LVDS666,
@@ -582,7 +488,7 @@ struct display_info_t const displays[] = {{
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
+} }, { */
 	.bus	= 0,
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_LVDS666,
@@ -602,7 +508,7 @@ struct display_info_t const displays[] = {{
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
+/*} }, {
 	.bus	= 2,
 	.addr	= 0x38,
 	.pixfmt	= IPU_PIX_FMT_LVDS666,
@@ -621,46 +527,6 @@ struct display_info_t const displays[] = {{
 		.hsync_len      = 60,
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 2,
-	.addr	= 0x10,
-	.pixfmt	= IPU_PIX_FMT_RGB666,
-	.detect	= detect_i2c,
-	.enable	= enable_rgb,
-	.mode	= {
-		.name           = "fusion7",
-		.refresh        = 60,
-		.xres           = 800,
-		.yres           = 480,
-		.pixclock       = 33898,
-		.left_margin    = 96,
-		.right_margin   = 24,
-		.upper_margin   = 3,
-		.lower_margin   = 10,
-		.hsync_len      = 72,
-		.vsync_len      = 7,
-		.sync           = 0x40000002,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 0,
-	.addr	= 0,
-	.pixfmt	= IPU_PIX_FMT_RGB666,
-	.detect	= NULL,
-	.enable	= enable_rgb,
-	.mode	= {
-		.name           = "svga",
-		.refresh        = 60,
-		.xres           = 800,
-		.yres           = 600,
-		.pixclock       = 15385,
-		.left_margin    = 220,
-		.right_margin   = 40,
-		.upper_margin   = 21,
-		.lower_margin   = 7,
-		.hsync_len      = 60,
-		.vsync_len      = 10,
-		.sync           = 0,
 		.vmode          = FB_VMODE_NONINTERLACED
 } }, {
 	.bus	= 2,
@@ -701,47 +567,7 @@ struct display_info_t const displays[] = {{
 		.hsync_len      = 60,
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 2,
-	.addr	= 0x48,
-	.pixfmt	= IPU_PIX_FMT_RGB666,
-	.detect	= detect_i2c,
-	.enable	= enable_rgb,
-	.mode	= {
-		.name           = "wvga-rgb",
-		.refresh        = 57,
-		.xres           = 800,
-		.yres           = 480,
-		.pixclock       = 37037,
-		.left_margin    = 40,
-		.right_margin   = 60,
-		.upper_margin   = 10,
-		.lower_margin   = 10,
-		.hsync_len      = 20,
-		.vsync_len      = 10,
-		.sync           = 0,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 0,
-	.addr	= 0,
-	.pixfmt	= IPU_PIX_FMT_RGB24,
-	.detect	= NULL,
-	.enable	= enable_rgb,
-	.mode	= {
-		.name           = "qvga",
-		.refresh        = 60,
-		.xres           = 320,
-		.yres           = 240,
-		.pixclock       = 37037,
-		.left_margin    = 38,
-		.right_margin   = 37,
-		.upper_margin   = 16,
-		.lower_margin   = 15,
-		.hsync_len      = 30,
-		.vsync_len      = 3,
-		.sync           = 0,
-		.vmode          = FB_VMODE_NONINTERLACED
+		.vmode          = FB_VMODE_NONINTERLACED*/
 } } };
 size_t display_count = ARRAY_SIZE(displays);
 
@@ -757,7 +583,7 @@ static void setup_display(void)
 	int reg;
 
 	enable_ipu_clock();
-	imx_setup_hdmi();
+	/* imx_setup_hdmi(); */
 	/* Turn on LDB0,IPU,IPU DI0 clocks */
 	reg = __raw_readl(&mxc_ccm->CCGR3);
 	reg |=  MXC_CCM_CCGR3_LDB_DI0_MASK;
@@ -802,7 +628,14 @@ static void setup_display(void)
 	imx_iomux_v3_setup_multiple_pads(backlight_pads,
 					 ARRAY_SIZE(backlight_pads));
 	gpio_direction_input(LVDS_BACKLIGHT_GP);
-	gpio_direction_input(RGB_BACKLIGHT_GP);
+    
+    // bl out for test
+    gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
+    gpio_set_value(LVDS_BACKLIGHT_GP, 1);
+    
+    pwm_init(LVDS_BLACKLIGHT_PWM, 0, 0);
+    pwm_config(LVDS_BLACKLIGHT_PWM, 25000, 50000);
+    pwm_enable(LVDS_BLACKLIGHT_PWM);
 }
 #endif
 
@@ -862,7 +695,6 @@ int board_early_init_f(void)
 	gpio_direction_output(IMX_GPIO_NR(2, 5) , 0);
 
 	gpio_set_value(IMX_GPIO_NR(2, 0), 1);
-	gpio_set_value(IMX_GPIO_NR(2, 5), 1);
 
 	setup_iomux_uart();
 
@@ -936,6 +768,9 @@ int board_init(void)
 #endif
 
     pfuze_init();
+    
+    // last boot LED
+	gpio_set_value(IMX_GPIO_NR(2, 5), 1);
 
 	return 0;
 }
@@ -985,10 +820,57 @@ static int do_kbd(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	return numpressed == 0;
 }
 
+
 U_BOOT_CMD(
 	kbd, 1, 1, do_kbd,
 	"Tests for keypresses, sets 'keybd' environment variable",
 	"Returns 0 (true) to shell if key is pressed."
+);
+static int change_blacklight_pwm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+    uint32_t duty_cycle;
+    uint32_t period;
+    
+    if (argc > 2)
+    {
+        duty_cycle = simple_strtoul(argv[1], NULL, 10);
+        period = simple_strtoul(argv[2], NULL, 10);
+    
+        printf("change blacklight: \n    duty cycle: %u ns\n    period: %u ns\n", duty_cycle, period);
+        pwm_disable(LVDS_BLACKLIGHT_PWM);
+        pwm_config(LVDS_BLACKLIGHT_PWM, duty_cycle, period);
+        pwm_enable(LVDS_BLACKLIGHT_PWM);
+    }
+    else
+    {
+        printf("change blacklight: too few arguments\n\n");
+    }
+    
+    return 0;
+}
+
+static int change_blacklight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+    uint32_t enable;
+
+    if (argc > 1)
+    {
+        enable = (simple_strtoul(argv[1], NULL, 10) & 0x1);
+        printf("set blacklight enable to: %u\n\n", enable);
+        gpio_set_value(LVDS_BACKLIGHT_GP, enable);
+    }
+}
+
+U_BOOT_CMD(
+	blpwm, 3, 1, change_blacklight_pwm,
+	"Configure the blacklight pwm: ",
+	"blpwm duty_cycle_in_ns clock_period_in_ns"
+);
+
+U_BOOT_CMD(
+	blen, 2, 1, change_blacklight_enable,
+	"Enable/disable the blacklight pwm: ",
+	"blen 1/0"
 );
 
 #ifdef CONFIG_PREBOOT

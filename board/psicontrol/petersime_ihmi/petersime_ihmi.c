@@ -444,13 +444,32 @@ static void enable_lvds(struct display_info_t const *dev)
 	u32 reg = readl(&iomux->gpr[2]);
 	reg |= IOMUXC_GPR2_DATA_WIDTH_CH0_24BIT;
 	writel(reg, &iomux->gpr[2]);
-	gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
+	/*gpio_direction_output(LVDS_BACKLIGHT_GP, 1);*/
 }
 
 
 struct display_info_t const displays[] = {{
-
-/*	.bus	= 0,
+    .bus	= 2,
+	.addr	= 0x4,
+	.pixfmt	= IPU_PIX_FMT_LVDS666,
+	.detect	= NULL,
+	.enable	= enable_lvds,
+	.mode	= {
+		.name           = "Texim Chefree CH121ILGL",
+		.refresh        = 60,
+		.xres           = 1024,
+		.yres           = 768,
+		.pixclock       = 15385, /* 65 MHz */
+		.left_margin    = 220,
+		.right_margin   = 100,
+		.upper_margin   = 21,
+		.lower_margin   = 17,
+		.hsync_len      = 60,
+		.vsync_len      = 10,
+		.sync           = FB_SYNC_EXT,
+		.vmode          = FB_VMODE_NONINTERLACED
+/*} }, {
+	.bus	= 0,
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB24,
 	.detect	= NULL,
@@ -468,7 +487,8 @@ struct display_info_t const displays[] = {{
 		.hsync_len      = 10,
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED} }, {
+		.vmode          = FB_VMODE_NONINTERLACED
+} }, {
 	.bus	= 2,
 	.addr	= 0x4,
 	.pixfmt	= IPU_PIX_FMT_LVDS666,
@@ -488,7 +508,7 @@ struct display_info_t const displays[] = {{
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
-} }, { */
+} }, {
 	.bus	= 0,
 	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_LVDS666,
@@ -499,7 +519,7 @@ struct display_info_t const displays[] = {{
 		.refresh        = 60,
 		.xres           = 1024,
 		.yres           = 768,
-		.pixclock       = 15385, /* ~65MHz */
+		.pixclock       = 15385, 
 		.left_margin    = 480,
 		.right_margin   = 260,
 		.upper_margin   = 16,
@@ -508,7 +528,7 @@ struct display_info_t const displays[] = {{
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
-/*} }, {
+} }, {
 	.bus	= 2,
 	.addr	= 0x38,
 	.pixfmt	= IPU_PIX_FMT_LVDS666,
@@ -624,12 +644,9 @@ static void setup_display(void)
 	       <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET);
 	writel(reg, &iomux->gpr[3]);
 
-	/* backlights off until needed */
+	/* backlight on */
 	imx_iomux_v3_setup_multiple_pads(backlight_pads,
 					 ARRAY_SIZE(backlight_pads));
-	gpio_direction_input(LVDS_BACKLIGHT_GP);
-    
-    // bl out for test
     gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
     gpio_set_value(LVDS_BACKLIGHT_GP, 1);
     
@@ -844,6 +861,7 @@ static int change_blacklight_pwm(cmd_tbl_t *cmdtp, int flag, int argc, char * co
     else
     {
         printf("change blacklight: too few arguments\n\n");
+        return 1;
     }
     
     return 0;
@@ -863,14 +881,14 @@ static int change_blacklight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char *
 
 U_BOOT_CMD(
 	blpwm, 3, 1, change_blacklight_pwm,
-	"Configure the blacklight pwm: ",
-	"blpwm duty_cycle_in_ns clock_period_in_ns"
+	"Configure the blacklight pwm: blpwm duty_cycle_in_ns clock_period_in_ns",
+	"duty_cycle_in_ns clock_period_in_ns"
 );
 
 U_BOOT_CMD(
 	blen, 2, 1, change_blacklight_enable,
-	"Enable/disable the blacklight pwm: ",
-	"blen 1/0"
+	"Enable/disable the blacklight pwm: blen 1/0",
+	"1/0"
 );
 
 #ifdef CONFIG_PREBOOT

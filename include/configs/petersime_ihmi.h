@@ -150,7 +150,7 @@
 #define CONFIG_CFB_CONSOLE /* set console on display */
 #define CONFIG_VGA_AS_SINGLE_DEVICE /* don't load keyboard driver , only display */
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV /* first say it can be in environment */
-#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE /* then overwrite it and say it's serial anyways */
+#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE /*  then overwrite it and say it's serial anyways */
 #define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_SPLASH_SCREEN
 #define CONFIG_BMP_16BPP
@@ -349,7 +349,7 @@
 #define CONFIG_CMD_CACHE
 #endif
 
-/* #define CONFIG_CMD_BMP */
+#define CONFIG_CMD_BMP 
 
 #define CONFIG_CMD_TIME
 #define CONFIG_CMD_MEMTEST

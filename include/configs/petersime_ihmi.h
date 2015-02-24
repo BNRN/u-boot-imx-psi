@@ -14,6 +14,9 @@
 #define CONFIG_MX6
 #define CONFIG_DISPLAY_CPUINFO
 #define CONFIG_DISPLAY_BOARDINFO
+#define CONFIG_SHOW_BOOT_PROGRESS
+#define CONFIG_BOOTSTAGE 
+#define CONFIG_BOOTSTAGE_REPORT
 
 #define CONFIG_MACH_TYPE	3769
 
@@ -71,6 +74,23 @@
 #define CONFIG_POWER_I2C
 #define CONFIG_POWER_PFUZE100
 #define CONFIG_POWER_PFUZE100_I2C_ADDR	0x08
+
+/* RTC */
+#define CONFIG_CMD_DATE
+#define CONFIG_RTC_M41T11
+#define CONFIG_SYS_I2C_RTC_ADDR		    0x68
+#define CONFIG_SYS_M41T11_BASE_YEAR     2000
+
+/* Eeprom */
+#define CONFIG_CMD_EEPROM
+/* these are for the ST M24C02 2kbit serial i2c eeprom */
+#define CONFIG_SYS_I2C_EEPROM_ADDR	0x50		/* base address */
+#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	1		/* bytes of address */
+/* mask of address bits that overflow into the "EEPROM chip address"    */
+/* #define CONFIG_SYS_I2C_EEPROM_ADDR_OVERFLOW	0x07 */
+
+#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS	4	/* 16 byte write page size */
+#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	10	/* and takes up to 10 msec */
 
 /* MMC Configs */
 #define CONFIG_FSL_ESDHC
@@ -146,20 +166,21 @@
 
 /* Framebuffer and LCD */
 #define CONFIG_VIDEO /* enable video */
-#define CONFIG_VIDEO_IPUV3 /* enable i.MX6 video driver */
+#define CONFIG_VIDEO_IPUV3 /* enable i.MX6 image processing unit */
 #define CONFIG_CFB_CONSOLE /* set console on display */
+#define CONFIG_IMX_VIDEO_SKIP /* activate the i.MX6 panel detection, which we override */
 #define CONFIG_VGA_AS_SINGLE_DEVICE /* don't load keyboard driver , only display */
+#define CONFIG_CONSOLE_MUX /* muxing the console between serial and display */
 #define CONFIG_SYS_CONSOLE_IS_IN_ENV /* first say it can be in environment */
-#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE /*  then overwrite it and say it's serial anyways */
-#define CONFIG_VIDEO_BMP_RLE8
-#define CONFIG_SPLASH_SCREEN
-#define CONFIG_BMP_16BPP
-#define CONFIG_IPUV3_CLK 260000000
+/*#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE*/ /*  then override it and say it's serial anyways */
+#define CONFIG_VIDEO_BMP_RLE8  /* 8 bit color characters! */
+#define CONFIG_SPLASH_SCREEN /* enable splash screen */
+#define CONFIG_BMP_16BPP /* in 16BPP */
+#define CONFIG_IPUV3_CLK 260000000 /* dummy value, not actually true */
 /* #define CONFIG_CMD_HDMIDETECT */
-#define CONFIG_CONSOLE_MUX
 /* #define CONFIG_IMX_HDMI */
-#define CONFIG_IMX_VIDEO_SKIP
 
+/* backlight PWM */
 #define CONFIG_PWM_IMX
 #define CONFIG_IMX6_PWM_PER_CLK	66000000
 
@@ -179,7 +200,7 @@
 /* #define CONFIG_PREBOOT                 "" */
 
 #define CONFIG_LOADADDR			       0x12000000
-#define CONFIG_SYS_TEXT_BASE	       0x17800000
+#define CONFIG_SYS_TEXT_BASE	       0x37800000
 
 #ifdef CONFIG_CMD_SATA
 #define CONFIG_DRIVE_SATA "sata "
@@ -281,10 +302,83 @@
 #else
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootdevs=" CONFIG_DRIVE_TYPES "\0" \
+    "autoload=no\0" \
+    "autostart=no\0" \
 	"umsdevs=" CONFIG_UMSDEVS "\0" \
 	"console=ttymxc1\0" \
 	"ethaddr=00:04:9f:00:ea:d4\0" \
-	"fec_addr=00:04:9f:00:ea:d4\0" 
+	"fec_addr=00:04:9f:00:ea:d4\0" \
+    "bootcmd_emc=run emcscript_start;\0" \
+    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2;\0" \
+    "bootcmd_no_emc=fatload mmc 0 11000000 /petersime_ihmi.dtb;" \
+        "fatload mmc 0 12000000 /uImage;bootm 12000000 - 11000000;\0" \
+    "bootcmd=run bootcmd_no_emc;\0"\
+    "emcscript_start=echo STARTING EMC TEST...;"\
+        "usb start;" \
+        "sf probe;" \
+        "run emcscript_loop;\0" \
+    "emcscript_loop="\
+        "fatload mmc 0 10000000 /testbeeld3.bmp;" \
+        "sf erase 0 10000;"\
+        "sf write 10000000 0 10000;" \
+        "sf read 10000000 0 10000;" \
+        "bmp display 10000000;" \
+        "fatload usb 0 11000000 /testbeeld2.bmp;" \
+        "eeprom write 11000000 0 100;"\
+        "eeprom read 11000000 0 100;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "bmp display 11000000;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "pmic PFUZE100 dump;" \
+        "run emcscript_loop;\0"
+       
+/*"dhcp; ping 74.125.224.72;" \ */
 #endif
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LONGHELP
@@ -322,7 +416,7 @@
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH
 
-#define CONFIG_ENV_SIZE			(8 * 1024)
+#define CONFIG_ENV_SIZE			(64 * 1024)
 
 #define CONFIG_ENV_IS_IN_SPI_FLASH
 
@@ -330,7 +424,7 @@
 #define CONFIG_ENV_OFFSET		(6 * 64 * 1024)
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #elif defined(CONFIG_ENV_IS_IN_SPI_FLASH)
-#define CONFIG_ENV_OFFSET		(768 * 1024)
+#define CONFIG_ENV_OFFSET		(8128 * 1024)
 #define CONFIG_ENV_SECT_SIZE		(64 * 1024)
 #define CONFIG_ENV_SPI_BUS		CONFIG_SF_DEFAULT_BUS
 #define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS

@@ -6,4 +6,4 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-obj-y  := petersime_ihmi.o
+obj-y  := petersime_ihmi.o UART3.o

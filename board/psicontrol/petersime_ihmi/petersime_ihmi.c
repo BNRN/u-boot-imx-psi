@@ -34,6 +34,7 @@
 #include <input.h>
 #include <netdev.h>
 #include <usb/ehci-fsl.h>
+//#include <UART3.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 #define GP_USB_OTG_PWR	IMX_GPIO_NR(3, 22)
@@ -72,6 +73,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define OUTPUT_40OHM (PAD_CTL_SPEED_MED|PAD_CTL_DSE_40ohm)
 
+#define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
 
 int dram_init(void)
 {
@@ -80,31 +82,37 @@ int dram_init(void)
 	return 0;
 }
 
-iomux_v3_cfg_t const uart1_pads[] = {
+/* debug */
+static iomux_v3_cfg_t const uart1_pads[] = {
 	MX6_PAD_CSI0_DAT10__UART1_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 	MX6_PAD_CSI0_DAT11__UART1_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
+/* testconnector */
 static iomux_v3_cfg_t const uart2_pads[] = {
 	MX6_PAD_EIM_D26__UART2_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 	MX6_PAD_EIM_D27__UART2_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
-#define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
+/* captouch */
+static iomux_v3_cfg_t const uart3_pads[] = {
+	MX6_PAD_EIM_D24__UART3_TX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
+	MX6_PAD_EIM_D25__UART3_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
+};
 
-/* I2C1, SGTL5000 */
-/*static struct i2c_pads_info i2c_pad_info0 = {
+/* I2C1, Eeprom & RTC */
+static struct i2c_pads_info i2c_pad_info0 = {
 	.scl = {
-		.i2c_mode = MX6_PAD_EIM_D21__I2C1_SCL | PC,
-		.gpio_mode = MX6_PAD_EIM_D21__GPIO3_IO21 | PC,
-		.gp = IMX_GPIO_NR(3, 21)
+		.i2c_mode = MX6_PAD_CSI0_DAT9__I2C1_SCL | PC,
+		.gpio_mode = MX6_PAD_CSI0_DAT9__GPIO5_IO27 | PC,
+		.gp = IMX_GPIO_NR(5, 27)
 	},
 	.sda = {
-		.i2c_mode = MX6_PAD_EIM_D28__I2C1_SDA | PC,
-		.gpio_mode = MX6_PAD_EIM_D28__GPIO3_IO28 | PC,
-		.gp = IMX_GPIO_NR(3, 28)
+		.i2c_mode = MX6_PAD_CSI0_DAT8__I2C1_SDA | PC,
+		.gpio_mode = MX6_PAD_CSI0_DAT8__GPIO5_IO26 | PC,
+		.gp = IMX_GPIO_NR(5, 26)
 	}
-};*/
+};
 
 /* I2C2 PMIC */
 static struct i2c_pads_info i2c_pad_info1 = {
@@ -120,19 +128,19 @@ static struct i2c_pads_info i2c_pad_info1 = {
 	}
 };
 
-/* I2C3, J15 - RGB connector */
-/*static struct i2c_pads_info i2c_pad_info2 = {
+/* I2C3 testpad */
+static struct i2c_pads_info i2c_pad_info2 = {
 	.scl = {
-		.i2c_mode = MX6_PAD_GPIO_5__I2C3_SCL | PC,
-		.gpio_mode = MX6_PAD_GPIO_5__GPIO1_IO05 | PC,
-		.gp = IMX_GPIO_NR(1, 5)
+		.i2c_mode = MX6_PAD_EIM_D17__I2C3_SCL | PC,
+		.gpio_mode = MX6_PAD_EIM_D17__GPIO3_IO17 | PC,
+		.gp = IMX_GPIO_NR(3, 17)
 	},
 	.sda = {
-		.i2c_mode = MX6_PAD_GPIO_16__I2C3_SDA | PC,
-		.gpio_mode = MX6_PAD_GPIO_16__GPIO7_IO11 | PC,
-		.gp = IMX_GPIO_NR(7, 11)
+		.i2c_mode = MX6_PAD_EIM_D18__I2C3_SDA | PC,
+		.gpio_mode = MX6_PAD_EIM_D18__GPIO3_IO18 | PC,
+		.gp = IMX_GPIO_NR(3, 18)
 	}
-};*/
+};
 
 static iomux_v3_cfg_t const usdhc3_pads[] = {
 	MX6_PAD_SD3_CLK__SD3_CLK   | MUX_PAD_CTRL(USDHC_PAD_CTRL),
@@ -151,9 +159,11 @@ static iomux_v3_cfg_t const usdhc4_pads[] = {
 	MX6_PAD_SD4_DAT1__SD4_DATA1 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_SD4_DAT2__SD4_DATA2 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 	MX6_PAD_SD4_DAT3__SD4_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
-	MX6_PAD_NANDF_D6__GPIO2_IO06    | MUX_PAD_CTRL(NO_PAD_CTRL), /* CD */
+	MX6_PAD_SD4_DAT4__SD4_DATA4 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	MX6_PAD_SD4_DAT5__SD4_DATA5 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	MX6_PAD_SD4_DAT6__SD4_DATA6 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
+	MX6_PAD_SD4_DAT7__SD4_DATA7 | MUX_PAD_CTRL(USDHC_PAD_CTRL),
 };
-
 
 
 
@@ -177,6 +187,7 @@ static iomux_v3_cfg_t const enet_pads[] = {
 
 
 
+
 static iomux_v3_cfg_t const misc_pads[] = {
 	MX6_PAD_GPIO_1__USB_OTG_ID		| MUX_PAD_CTRL(WEAK_PULLUP),
 	MX6_PAD_EIM_D21__USB_OTG_OC		| MUX_PAD_CTRL(WEAK_PULLUP),
@@ -185,17 +196,17 @@ static iomux_v3_cfg_t const misc_pads[] = {
 };
 
 /* wl1271 pads on nitrogen6x */
-static iomux_v3_cfg_t const wl12xx_pads[] = {
-	(MX6_PAD_NANDF_CS1__GPIO6_IO14 & ~MUX_PAD_CTRL_MASK)
-		| MUX_PAD_CTRL(WEAK_PULLDOWN),
-	(MX6_PAD_NANDF_CS2__GPIO6_IO15 & ~MUX_PAD_CTRL_MASK)
-		| MUX_PAD_CTRL(OUTPUT_40OHM),
-	(MX6_PAD_NANDF_CS3__GPIO6_IO16 & ~MUX_PAD_CTRL_MASK)
-		| MUX_PAD_CTRL(OUTPUT_40OHM),
-};
-#define WL12XX_WL_IRQ_GP	IMX_GPIO_NR(6, 14)
-#define WL12XX_WL_ENABLE_GP	IMX_GPIO_NR(6, 15)
-#define WL12XX_BT_ENABLE_GP	IMX_GPIO_NR(6, 16)
+// static iomux_v3_cfg_t const wl12xx_pads[] = {
+	// (MX6_PAD_NANDF_CS1__GPIO6_IO14 & ~MUX_PAD_CTRL_MASK)
+		// | MUX_PAD_CTRL(WEAK_PULLDOWN),
+	// (MX6_PAD_NANDF_CS2__GPIO6_IO15 & ~MUX_PAD_CTRL_MASK)
+		// | MUX_PAD_CTRL(OUTPUT_40OHM),
+	// (MX6_PAD_NANDF_CS3__GPIO6_IO16 & ~MUX_PAD_CTRL_MASK)
+		// | MUX_PAD_CTRL(OUTPUT_40OHM),
+// };
+// #define WL12XX_WL_IRQ_GP	IMX_GPIO_NR(6, 14)
+// #define WL12XX_WL_ENABLE_GP	IMX_GPIO_NR(6, 15)
+// #define WL12XX_BT_ENABLE_GP	IMX_GPIO_NR(6, 16)
 
 // /* Button assignments for J14 */
 // static iomux_v3_cfg_t const button_pads[] = {
@@ -235,11 +246,32 @@ static void setup_iomux_uart(void)
 {
 	imx_iomux_v3_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads));
 	imx_iomux_v3_setup_multiple_pads(uart2_pads, ARRAY_SIZE(uart2_pads));
+	imx_iomux_v3_setup_multiple_pads(uart3_pads, ARRAY_SIZE(uart3_pads));
+}
+
+static void enable_led(unsigned number, unsigned on_off)
+{
+    iomux_v3_cfg_t config = (on_off) ? MUX_PAD_CTRL(WEAK_PULLDOWN) : MUX_PAD_CTRL(WEAK_PULLUP);
+
+    switch(number)
+    {
+        case 0:
+            imx_iomux_v3_setup_pad(MX6_PAD_NANDF_D0__GPIO2_IO00 | config);
+            gpio_direction_output(IMX_GPIO_NR(2, 0), on_off);
+            break;
+        case 1:
+            imx_iomux_v3_setup_pad(MX6_PAD_NANDF_D5__GPIO2_IO05 | config);
+            gpio_direction_output(IMX_GPIO_NR(2, 5), on_off);
+            break;
+    }   
+    
+    /* todo change with new boards */
+    
 }
 
 static iomux_v3_cfg_t const led_pads[] = {
-	MX6_PAD_NANDF_D0__GPIO2_IO00 | MUX_PAD_CTRL(NO_PAD_CTRL),
-	MX6_PAD_NANDF_D5__GPIO2_IO05 | MUX_PAD_CTRL(NO_PAD_CTRL),
+	MX6_PAD_NANDF_D0__GPIO2_IO00 | MUX_PAD_CTRL(WEAK_PULLUP),
+	MX6_PAD_NANDF_D5__GPIO2_IO05 | MUX_PAD_CTRL(WEAK_PULLUP),
 	
 };
 
@@ -444,14 +476,14 @@ static void enable_lvds(struct display_info_t const *dev)
 	u32 reg = readl(&iomux->gpr[2]);
 	reg |= IOMUXC_GPR2_DATA_WIDTH_CH0_24BIT;
 	writel(reg, &iomux->gpr[2]);
-	/*gpio_direction_output(LVDS_BACKLIGHT_GP, 1);*/
+	gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
 }
 
 
 struct display_info_t const displays[] = {{
     .bus	= 2,
 	.addr	= 0x4,
-	.pixfmt	= IPU_PIX_FMT_LVDS666,
+	.pixfmt	= IPU_PIX_FMT_RGB24,
 	.detect	= NULL,
 	.enable	= enable_lvds,
 	.mode	= {
@@ -459,7 +491,7 @@ struct display_info_t const displays[] = {{
 		.refresh        = 60,
 		.xres           = 1024,
 		.yres           = 768,
-		.pixclock       = 15385, /* 65 MHz */
+		.pixclock       = 15385, /* 65 MHz = 15385 */
 		.left_margin    = 220,
 		.right_margin   = 100,
 		.upper_margin   = 21,
@@ -608,24 +640,31 @@ static void setup_display(void)
 	reg = __raw_readl(&mxc_ccm->CCGR3);
 	reg |=  MXC_CCM_CCGR3_LDB_DI0_MASK;
 	writel(reg, &mxc_ccm->CCGR3);
+    
+	/* set LDB0 clk select to 011 -> select MMDC clk */
+	/*reg = readl(&mxc_ccm->cs2cdr); 
+	reg &= ~(MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_MASK); 
+	reg |= (3<<MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_OFFSET); 
+	writel(reg, &mxc_ccm->cs2cdr); */
+    
+	/* set LDB0 clk select to 100 -> select PLL3 480 MHz */
+	reg = readl(&mxc_ccm->cs2cdr); 
+	reg &= ~(MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_MASK); 
+	reg |= (4<<MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_OFFSET); 
+	writel(reg, &mxc_ccm->cs2cdr); 
 
-	/* set LDB0, LDB1 clk select to 011/011 */
-	reg = readl(&mxc_ccm->cs2cdr);
-	reg &= ~(MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_MASK
-		 |MXC_CCM_CS2CDR_LDB_DI1_CLK_SEL_MASK);
-	reg |= (3<<MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_OFFSET)
-	      |(3<<MXC_CCM_CS2CDR_LDB_DI1_CLK_SEL_OFFSET);
-	writel(reg, &mxc_ccm->cs2cdr);
+    /*set ldb_di0_ipu_div to 1 -> divide by 7  */
+	reg = readl(&mxc_ccm->cscmr2); 
+	reg |= MXC_CCM_CSCMR2_LDB_DI0_IPU_DIV; 
+	writel(reg, &mxc_ccm->cscmr2); 
 
-	reg = readl(&mxc_ccm->cscmr2);
-	reg |= MXC_CCM_CSCMR2_LDB_DI0_IPU_DIV;
-	writel(reg, &mxc_ccm->cscmr2);
-
-	reg = readl(&mxc_ccm->chsccdr);
-	reg |= (CHSCCDR_CLK_SEL_LDB_DI0
+    /* select ldb_di0_clk for ipu_di_clk_sel */
+	reg = readl(&mxc_ccm->chsccdr); 
+	reg |= (CHSCCDR_CLK_SEL_LDB_DI0 
 		<<MXC_CCM_CHSCCDR_IPU1_DI0_CLK_SEL_OFFSET);
-	writel(reg, &mxc_ccm->chsccdr);
-
+	writel(reg, &mxc_ccm->chsccdr); 
+    	
+    
 	reg = IOMUXC_GPR2_BGREF_RRMODE_EXTERNAL_RES
 	     |IOMUXC_GPR2_DI1_VS_POLARITY_ACTIVE_HIGH
 	     |IOMUXC_GPR2_DI0_VS_POLARITY_ACTIVE_LOW
@@ -638,20 +677,18 @@ static void setup_display(void)
 	writel(reg, &iomux->gpr[2]);
 
 	reg = readl(&iomux->gpr[3]);
-	reg = (reg & ~(IOMUXC_GPR3_LVDS0_MUX_CTL_MASK
-			|IOMUXC_GPR3_HDMI_MUX_CTL_MASK))
+	reg = (reg & ~(IOMUXC_GPR3_LVDS0_MUX_CTL_MASK)
 	    | (IOMUXC_GPR3_MUX_SRC_IPU1_DI0
-	       <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET);
+	       <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET));
 	writel(reg, &iomux->gpr[3]);
 
-	/* backlight on */
+	/* backlight off for now */
 	imx_iomux_v3_setup_multiple_pads(backlight_pads,
 					 ARRAY_SIZE(backlight_pads));
-    gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
-    gpio_set_value(LVDS_BACKLIGHT_GP, 1);
+	gpio_direction_input(LVDS_BACKLIGHT_GP);
     
     pwm_init(LVDS_BLACKLIGHT_PWM, 0, 0);
-    pwm_config(LVDS_BLACKLIGHT_PWM, 25000, 50000);
+    pwm_config(LVDS_BLACKLIGHT_PWM, 40000, 50000);
     pwm_enable(LVDS_BLACKLIGHT_PWM);
 }
 #endif
@@ -678,54 +715,23 @@ static iomux_v3_cfg_t const init_pads[] = {
 	NEW_PAD_CTRL(MX6_PAD_GPIO_6__GPIO1_IO06, OUTPUT_40OHM),
 };
 
-#define WL12XX_WL_IRQ_GP	IMX_GPIO_NR(6, 14)
-
-static unsigned gpios_out_low[] = {
-	/* Disable wl1271 */
-	IMX_GPIO_NR(6, 15),	/* disable wireless */
-	IMX_GPIO_NR(6, 16),	/* disable bluetooth */
-	IMX_GPIO_NR(3, 22),	/* disable USB otg power */
-	IMX_GPIO_NR(2, 5),	/* ov5640 mipi camera reset */
-	IMX_GPIO_NR(1, 8),	/* ov5642 reset */
-};
-
-static unsigned gpios_out_high[] = {
-	IMX_GPIO_NR(1, 6),	/* ov5642 powerdown */
-	IMX_GPIO_NR(6, 9),	/* ov5640 mipi camera power down */
-};
-
-static void set_gpios(unsigned *p, int cnt, int val)
-{
-	int i;
-
-	for (i = 0; i < cnt; i++)
-		gpio_direction_output(*p++, val);
-}
-
 int board_early_init_f(void)
 {
-
-      // debug !!
-	setup_iomux_leds();
-
-	gpio_direction_output(IMX_GPIO_NR(2, 0) , 0);
-	gpio_direction_output(IMX_GPIO_NR(2, 5) , 0);
-
-	gpio_set_value(IMX_GPIO_NR(2, 0), 1);
-
+    // LEDS on
+    enable_led(0, 1);
+    enable_led(1, 1);
+    
+    // uart
 	setup_iomux_uart();
-
-	//set_gpios(gpios_out_high, ARRAY_SIZE(gpios_out_high), 1);
-	//set_gpios(gpios_out_low, ARRAY_SIZE(gpios_out_low), 0);
-	//gpio_direction_input(WL12XX_WL_IRQ_GP);
-
-	//imx_iomux_v3_setup_multiple_pads(wl12xx_pads, ARRAY_SIZE(wl12xx_pads));
-	//imx_iomux_v3_setup_multiple_pads(init_pads, ARRAY_SIZE(init_pads));
-	//setup_buttons();
 
 #if defined(CONFIG_VIDEO_IPUV3)
 	setup_display();
 #endif
+
+    // blink LEDs
+    enable_led(0, 0);
+    enable_led(1, 0);
+
 	return 0;
 }
 
@@ -776,9 +782,9 @@ int board_init(void)
 #endif
 	// imx_iomux_v3_setup_multiple_pads(
 		// usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-	//setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0);
+	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0); // RTC , eeprom
 	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1); // PMIC
-	//setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2);
+	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2); // testpad
 
 #ifdef CONFIG_CMD_SATA
 	setup_sata();
@@ -786,8 +792,12 @@ int board_init(void)
 
     pfuze_init();
     
-    // last boot LED
-	gpio_set_value(IMX_GPIO_NR(2, 5), 1);
+    // captouch 
+    uart3_init();
+    
+    // done booting
+    
+	enable_led(0, 0);
 
 	return 0;
 }
@@ -879,6 +889,34 @@ static int change_blacklight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char *
     }
 }
 
+static int send_receive_uart3(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+    char* tosend;
+
+    if (argc > 1)
+    {
+        tosend = argv[1];
+        printf("sending string: %s\n\n", tosend);
+        puts("received: ");
+        
+        while (*tosend != '\0')
+        {
+            uart3_putc(*tosend);
+            
+            udelay(1000);
+            
+            if (uart3_tstc())
+                putc(uart3_getc());
+                
+            tosend++;
+        }
+        
+        puts("\n\n");
+        
+    }
+    
+}
+
 U_BOOT_CMD(
 	blpwm, 3, 1, change_blacklight_pwm,
 	"Configure the blacklight pwm: blpwm duty_cycle_in_ns clock_period_in_ns",
@@ -889,6 +927,12 @@ U_BOOT_CMD(
 	blen, 2, 1, change_blacklight_enable,
 	"Enable/disable the blacklight pwm: blen 1/0",
 	"1/0"
+);
+
+U_BOOT_CMD(
+	captouch, 2, 1, send_receive_uart3,
+	"test the captouch: captouch string",
+	"string"
 );
 
 #ifdef CONFIG_PREBOOT
@@ -950,3 +994,17 @@ int misc_init_r(void)
 #endif
 	return 0;
 }
+
+#ifdef CONFIG_SHOW_BOOT_PROGRESS
+void show_boot_progress(int progress)
+{
+    static int on_off = 0;
+    on_off = !on_off;
+
+	if (progress > 0)
+		return;
+
+	enable_led(0, on_off);
+	enable_led(1, 0);
+}
+#endif

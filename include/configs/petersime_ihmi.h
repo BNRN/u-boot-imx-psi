@@ -200,7 +200,7 @@
 /* #define CONFIG_PREBOOT                 "" */
 
 #define CONFIG_LOADADDR			       0x12000000
-#define CONFIG_SYS_TEXT_BASE	       0x37800000
+#define CONFIG_SYS_TEXT_BASE	       0x47800000
 
 #ifdef CONFIG_CMD_SATA
 #define CONFIG_DRIVE_SATA "sata "

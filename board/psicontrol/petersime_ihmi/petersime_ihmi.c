@@ -416,6 +416,7 @@ int board_eth_init(bd_t *bis)
 	int ret;
 
 	setup_iomux_enet();
+	enable_enet_clk(1);
 
 	bus = fec_get_miibus(base, -1);
 	if (!bus)

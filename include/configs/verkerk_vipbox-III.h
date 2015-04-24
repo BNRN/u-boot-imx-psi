@@ -63,6 +63,17 @@
 #define CONFIG_SYS_I2C_SPEED		100000
 #define CONFIG_I2C_EDID
 
+/* Eeprom */
+#define CONFIG_CMD_EEPROM
+/* these are for the ST M24C02 2kbit serial i2c eeprom */
+#define CONFIG_SYS_I2C_EEPROM_ADDR	0x50		/* base address */
+#define CONFIG_SYS_I2C_EEPROM_ADDR_LEN	1		/* bytes of address */
+/* mask of address bits that overflow into the "EEPROM chip address"    */
+/* #define CONFIG_SYS_I2C_EEPROM_ADDR_OVERFLOW	0x07 */
+
+#define CONFIG_SYS_EEPROM_PAGE_WRITE_BITS	4	/* 16 byte write page size */
+#define CONFIG_SYS_EEPROM_PAGE_WRITE_DELAY_MS	10	/* and takes up to 10 msec */
+
 /* PMIC */
 #define CONFIG_POWER
 #define CONFIG_POWER_I2C

@@ -99,8 +99,8 @@ static iomux_v3_cfg_t const uart2_pads[] = {
 	MX6_PAD_EIM_D25__UART3_RX_DATA | MUX_PAD_CTRL(UART_PAD_CTRL),
 };*/
 
-/* I2C1, Eeprom & RTC */
-/*static struct i2c_pads_info i2c_pad_info0 = {
+/* I2C1, Eeprom */
+static struct i2c_pads_info i2c_pad_info0 = {
 	.scl = {
 		.i2c_mode = MX6_PAD_CSI0_DAT9__I2C1_SCL | PC,
 		.gpio_mode = MX6_PAD_CSI0_DAT9__GPIO5_IO27 | PC,
@@ -111,7 +111,7 @@ static iomux_v3_cfg_t const uart2_pads[] = {
 		.gpio_mode = MX6_PAD_CSI0_DAT8__GPIO5_IO26 | PC,
 		.gp = IMX_GPIO_NR(5, 26)
 	}
-};*/
+};
 
 /* I2C2 PMIC */
 static struct i2c_pads_info i2c_pad_info1 = {
@@ -436,6 +436,7 @@ int board_init(void)
 	/* address of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
+	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0); // Eeprom
 	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1); // PMIC
 	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2); // testpad
 

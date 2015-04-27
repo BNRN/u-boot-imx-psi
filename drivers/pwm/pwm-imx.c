@@ -32,7 +32,7 @@ int pwm_config(int pwm_id, int duty_ns, int period_ns)
 	pwm_imx_get_parms(period_ns, duty_ns, &period_cycles, &duty_cycles,
 			  &prescale);
 
-    debug("Params: period_ns = %d, duty_ns = %d, period_cycles = %d, duty_cycles = %d, prescale = %d\n", period_ns, duty_ns, period_cycles, duty_cycles, prescale);
+    debug("Params: period_ns = %d, duty_ns = %d, period_cycles = %lu, duty_cycles = %lu, prescale = %lu\n", period_ns, duty_ns, period_cycles, duty_cycles, prescale);
     
 	cr = PWMCR_PRESCALER(prescale) |
 		PWMCR_DOZEEN | PWMCR_WAITEN |

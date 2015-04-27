@@ -10,7 +10,8 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
-
+/* #define DEBUG */
+ 
 #include <common.h>
 #include <asm/errno.h>
 #include <asm/global_data.h>
@@ -258,7 +259,7 @@ static int mxcfb_set_par(struct fb_info *fbi)
 	if (fbi->var.sync & FB_SYNC_CLK_IDLE_EN)
 		sig_cfg.clkidle_en = 1;
 
-	debug("pixclock = %ul Hz\n",
+	debug("pixclock = %u Hz\n",
 		(u32) (PICOS2KHZ(fbi->var.pixclock) * 1000UL));
 
 	if (ipu_init_sync_panel(mxc_fbi->ipu_di,

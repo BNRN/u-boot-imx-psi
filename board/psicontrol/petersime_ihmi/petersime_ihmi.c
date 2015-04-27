@@ -460,14 +460,14 @@ static iomux_v3_cfg_t const backlight_pads[] = {
 #define LVDS_BACKLIGHT_GP IMX_GPIO_NR(4, 31)
     /* PWM */
 	MX6_PAD_DISP0_DAT9__PWM2_OUT		| MUX_PAD_CTRL(WEAK_PULLUP)
-#define LVDS_BLACKLIGHT_PWM  1
+#define LVDS_BACKLIGHT_PWM  1
 };
 
-static int detect_i2c(struct display_info_t const *dev)
+static int detect_chimei(struct display_info_t const *dev)
 {
-	return ((0 == i2c_set_bus_num(dev->bus))
-		&&
-		(0 == i2c_probe(dev->addr)));
+    char* panel = getenv("enable_pdp_panel");
+    //printf("detecting PDP panel: %s\n", panel);
+	return (NULL != panel && 0 == strcmp(panel, "1"));
 }
 
 static void enable_lvds(struct display_info_t const *dev)
@@ -480,10 +480,9 @@ static void enable_lvds(struct display_info_t const *dev)
 	gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
 }
 
-
 struct display_info_t const displays[] = {{
-    .bus	= 2,
-	.addr	= 0x4,
+    .bus	= 0,
+	.addr	= 0,
 	.pixfmt	= IPU_PIX_FMT_RGB24,
 	.detect	= NULL,
 	.enable	= enable_lvds,
@@ -501,27 +500,27 @@ struct display_info_t const displays[] = {{
 		.vsync_len      = 10,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
-/*} }, {
+} }, {
 	.bus	= 0,
-	.addr	= 0,
+	.addr	= 1,
 	.pixfmt	= IPU_PIX_FMT_RGB24,
-	.detect	= NULL,
+	.detect	= detect_chimei,
 	.enable	= enable_lvds,
 	.mode	= {
-		.name           = "LDB-WXGA-S",
+		.name           = "Chimei G121S1-L02",
 		.refresh        = 60,
-		.xres           = 1280,
-		.yres           = 800,
-		.pixclock       = 14065,
-		.left_margin    = 40,
-		.right_margin   = 40,
-		.upper_margin   = 3,
-		.lower_margin   = 80,
-		.hsync_len      = 10,
-		.vsync_len      = 10,
+		.xres           = 800,
+		.yres           = 600,
+		.pixclock       = 25000,
+		.left_margin    = 156,
+		.right_margin   = 100,
+		.upper_margin   = 145,
+		.lower_margin   = 18,
+		.hsync_len      = 60,
+		.vsync_len      = 145,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
+/*} }, {
 	.bus	= 2,
 	.addr	= 0x4,
 	.pixfmt	= IPU_PIX_FMT_LVDS666,
@@ -634,6 +633,7 @@ static void setup_display(void)
 	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
 	struct iomuxc *iomux = (struct iomuxc *)IOMUXC_BASE_ADDR;
 	int reg;
+    int cs2cdr_value;
 
 	enable_ipu_clock();
 	/* imx_setup_hdmi(); */
@@ -641,20 +641,26 @@ static void setup_display(void)
 	reg = __raw_readl(&mxc_ccm->CCGR3);
 	reg |=  MXC_CCM_CCGR3_LDB_DI0_MASK;
 	writel(reg, &mxc_ccm->CCGR3);
+        
+    if (detect_chimei(NULL)) 
+    {
+        /* set LDB0 clk select to 001 -> select PFD0 306,58 MHz */
+        /* then divide by 7 -> 43,7 MHz */
+        cs2cdr_value = 1;
+    }
+    else
+    {
+        /* set LDB0 clk select to 100 -> select PLL3 480 MHz */
+        /* then divide by 7 -> 68,57 MHz */
+        cs2cdr_value = 4;
+    }    
     
-	/* set LDB0 clk select to 011 -> select MMDC clk */
-	/*reg = readl(&mxc_ccm->cs2cdr); 
-	reg &= ~(MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_MASK); 
-	reg |= (3<<MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_OFFSET); 
-	writel(reg, &mxc_ccm->cs2cdr); */
-    
-	/* set LDB0 clk select to 100 -> select PLL3 480 MHz */
 	reg = readl(&mxc_ccm->cs2cdr); 
 	reg &= ~(MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_MASK); 
-	reg |= (4<<MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_OFFSET); 
+	reg |= (cs2cdr_value<<MXC_CCM_CS2CDR_LDB_DI0_CLK_SEL_OFFSET); 
 	writel(reg, &mxc_ccm->cs2cdr); 
 
-    /*set ldb_di0_ipu_div to 1 -> divide by 7  */
+    /*set ldb_di0_ipu_div to 1 -> divide by 7 */
 	reg = readl(&mxc_ccm->cscmr2); 
 	reg |= MXC_CCM_CSCMR2_LDB_DI0_IPU_DIV; 
 	writel(reg, &mxc_ccm->cscmr2); 
@@ -688,9 +694,18 @@ static void setup_display(void)
 					 ARRAY_SIZE(backlight_pads));
 	gpio_direction_input(LVDS_BACKLIGHT_GP);
     
-    pwm_init(LVDS_BLACKLIGHT_PWM, 0, 0);
-    pwm_config(LVDS_BLACKLIGHT_PWM, 40000, 50000);
-    pwm_enable(LVDS_BLACKLIGHT_PWM);
+    pwm_init(LVDS_BACKLIGHT_PWM, 0, 0);
+    if (detect_chimei(NULL)) 
+    {
+        /* Chimei is 200 Hz */
+        pwm_config(LVDS_BACKLIGHT_PWM, 4000000, 5000000);
+    }
+    else
+    {
+        /* Chefree is 20 KHz */
+        pwm_config(LVDS_BACKLIGHT_PWM, 40000, 50000);
+    }
+    pwm_enable(LVDS_BACKLIGHT_PWM);
 }
 #endif
 
@@ -865,9 +880,9 @@ static int change_blacklight_pwm(cmd_tbl_t *cmdtp, int flag, int argc, char * co
         period = simple_strtoul(argv[2], NULL, 10);
     
         printf("change blacklight: \n    duty cycle: %u ns\n    period: %u ns\n", duty_cycle, period);
-        pwm_disable(LVDS_BLACKLIGHT_PWM);
-        pwm_config(LVDS_BLACKLIGHT_PWM, duty_cycle, period);
-        pwm_enable(LVDS_BLACKLIGHT_PWM);
+        pwm_disable(LVDS_BACKLIGHT_PWM);
+        pwm_config(LVDS_BACKLIGHT_PWM, duty_cycle, period);
+        pwm_enable(LVDS_BACKLIGHT_PWM);
     }
     else
     {

@@ -212,7 +212,7 @@ static struct clk ipu_clk = {
 
 static struct clk ldb_clk = {
 	.name = "ldb_clk",
-	.rate = 65000000,
+	.rate = CONFIG_IPUV3_CLK,
 	.usecount = 0,
 };
 

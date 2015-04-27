@@ -10,6 +10,7 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+
 #include "mx6_common.h"
 #define CONFIG_MX6
 #define CONFIG_DISPLAY_CPUINFO
@@ -32,6 +33,7 @@
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(100 * 1024 * 1024)
 
+
 #define CONFIG_BOARD_EARLY_INIT_F
 #define CONFIG_MISC_INIT_R
 #define CONFIG_MXC_GPIO
@@ -42,6 +44,10 @@
 #define CONFIG_USB_ETHER
 #define CONFIG_USB_ETH_CDC
 #define CONFIG_NETCONSOLE
+
+/*#define CONFIG_HW_WATCHDOG*/
+/* #define CONFIG_IMX_WATCHDOG */
+/* #define CONFIG_WATCHDOG_TIMEOUT_MSECS 2000 */
 
 #define CONFIG_CMD_FUSE
 #ifdef CONFIG_CMD_FUSE
@@ -176,7 +182,7 @@
 #define CONFIG_VIDEO_BMP_RLE8  /* 8 bit color characters! */
 #define CONFIG_SPLASH_SCREEN /* enable splash screen */
 #define CONFIG_BMP_16BPP /* in 16BPP */
-#define CONFIG_IPUV3_CLK 260000000 /* dummy value, not actually true */
+#define CONFIG_IPUV3_CLK 43857143 /* dummy value, not actually true */
 /* #define CONFIG_CMD_HDMIDETECT */
 /* #define CONFIG_IMX_HDMI */
 
@@ -306,12 +312,16 @@
     "autostart=no\0" \
 	"umsdevs=" CONFIG_UMSDEVS "\0" \
 	"console=ttymxc1\0" \
+    "enable_pdp_panel=0\0" \
 	"ethaddr=00:04:9f:00:ea:d4\0" \
 	"fec_addr=00:04:9f:00:ea:d4\0" \
     "bootcmd_emc=run emcscript_start;\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1;\0" \
     "bootcmd_no_emc=fatload mmc 0 11000000 /petersime_ihmi.dtb;" \
         "fatload mmc 0 12000000 /uImage;bootm 12000000 - 11000000;\0" \
+    "bootcmd=\0" \
+    "image=testbeeld4.bmp\0" \
+    "loadimage=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
     "bootcmd=run bootcmd_no_emc;\0"\
     "emcscript_start=echo STARTING EMC TEST...;"\
         "usb start;" \
@@ -393,8 +403,8 @@
 #define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
 
 #define CONFIG_SYS_MEMTEST_START       0x10000000
-#define CONFIG_SYS_MEMTEST_END	       0x10010000
-#define CONFIG_SYS_MEMTEST_SCRATCH     0x10800000
+#define CONFIG_SYS_MEMTEST_END	       0x50000000
+#define CONFIG_SYS_MEMTEST_SCRATCH     0x47800000
 
 #define CONFIG_SYS_LOAD_ADDR	       CONFIG_LOADADDR
 
@@ -412,6 +422,8 @@
 	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
+
+
 
 /* FLASH and environment organization */
 #define CONFIG_SYS_NO_FLASH

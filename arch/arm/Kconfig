@@ -524,6 +524,9 @@ config TARGET_JORNADA
 config TARGET_PETERSIME_IHMI
 	bool "Support psicontrol PS_IHMI board"
 
+config TARGET_PETERSIME_IHMI_SPL
+	bool "Support psicontrol PS_IHMI board (with SPL)"
+	
 config TARGET_VERKERK_VIPBOX_III
 	bool "Support psicontrol VK_VIPBOX board"
     
@@ -705,6 +708,7 @@ source "board/woodburn/Kconfig"
 source "board/xaeniax/Kconfig"
 source "board/zipitz2/Kconfig"
 source "board/psicontrol/petersime_ihmi/Kconfig"
+source "board/psicontrol/petersime_ihmi_spl/Kconfig"
 source "board/psicontrol/verkerk_vipbox-III/Kconfig"
 
 endmenu

@@ -1,0 +1,4 @@
+CONFIG_SPL=y
+CONFIG_SYS_EXTRA_OPTIONS="IMX_CONFIG=board/psicontrol/petersime_ihmi_spl/petersime_ihmi.cfg,MX6S,DDR_MB=1024,SPL"
++S:CONFIG_ARM=y
++S:CONFIG_TARGET_PETERSIME_IHMI_SPL=y

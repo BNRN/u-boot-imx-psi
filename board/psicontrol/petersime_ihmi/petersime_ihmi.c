@@ -407,7 +407,7 @@ int board_phy_config(struct phy_device *phydev)
 	return 0;
 }
 
-
+#ifdef CONFIG_CMD_NET
 int board_eth_init(bd_t *bis)
 {
 	uint32_t base = IMX_FEC_BASE;
@@ -443,13 +443,9 @@ int board_eth_init(bd_t *bis)
      
 	return ret;
 }
+#endif
 
 
-static void setup_buttons(void)
-{
-	// imx_iomux_v3_setup_multiple_pads(button_pads,
-					 // ARRAY_SIZE(button_pads));
-}
 
 #if defined(CONFIG_VIDEO_IPUV3)
 
@@ -707,6 +703,56 @@ static void setup_display(void)
     }
     pwm_enable(LVDS_BACKLIGHT_PWM);
 }
+
+
+static int change_blacklight_pwm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+    uint32_t duty_cycle;
+    uint32_t period;
+    
+    if (argc > 2)
+    {
+        duty_cycle = simple_strtoul(argv[1], NULL, 10);
+        period = simple_strtoul(argv[2], NULL, 10);
+    
+        printf("change blacklight: \n    duty cycle: %u ns\n    period: %u ns\n", duty_cycle, period);
+        pwm_disable(LVDS_BACKLIGHT_PWM);
+        pwm_config(LVDS_BACKLIGHT_PWM, duty_cycle, period);
+        pwm_enable(LVDS_BACKLIGHT_PWM);
+    }
+    else
+    {
+        printf("change blacklight: too few arguments\n\n");
+        return 1;
+    }
+    
+    return 0;
+}
+
+static int change_blacklight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+    uint32_t enable;
+
+    if (argc > 1)
+    {
+        enable = (simple_strtoul(argv[1], NULL, 10) & 0x1);
+        printf("set blacklight enable to: %u\n\n", enable);
+        gpio_set_value(LVDS_BACKLIGHT_GP, enable);
+    }
+}
+
+
+U_BOOT_CMD(
+	blpwm, 3, 1, change_blacklight_pwm,
+	"Configure the blacklight pwm: blpwm duty_cycle_in_ns clock_period_in_ns",
+	"duty_cycle_in_ns clock_period_in_ns"
+);
+
+U_BOOT_CMD(
+	blen, 2, 1, change_blacklight_enable,
+	"Enable/disable the blacklight pwm: blen 1/0",
+	"1/0"
+);
 #endif
 
 static iomux_v3_cfg_t const init_pads[] = {
@@ -745,8 +791,8 @@ int board_early_init_f(void)
 #endif
 
     // blink LEDs
-    enable_led(0, 0);
-    enable_led(1, 0);
+    //enable_led(0, 0);
+    //enable_led(1, 0);
 
 	return 0;
 }
@@ -796,20 +842,19 @@ int board_init(void)
 #ifdef CONFIG_MXC_SPI
 	setup_spi();
 #endif
-	// imx_iomux_v3_setup_multiple_pads(
-		// usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
+
+#ifdef CONFIG_CMD_I2C
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0); // RTC , eeprom
 	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1); // PMIC
 	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2); // testpad
-
-#ifdef CONFIG_CMD_SATA
-	setup_sata();
 #endif
 
+#ifdef CONFIG_POWER_PFUZE100
     pfuze_init();
-    
+#endif
+
     // captouch 
-    uart3_init();
+    //uart3_init();
     
     // done booting
     
@@ -825,85 +870,6 @@ int checkboard(void)
 	return 0;
 }
 
-struct button_key {
-	char const	*name;
-	unsigned	gpnum;
-	char		ident;
-};
-
-static struct button_key const buttons[] = {
-	{"back",	IMX_GPIO_NR(2, 2),	'B'},
-	{"home",	IMX_GPIO_NR(2, 4),	'H'},
-	{"menu",	IMX_GPIO_NR(2, 1),	'M'},
-	{"search",	IMX_GPIO_NR(2, 3),	'S'},
-	{"volup",	IMX_GPIO_NR(7, 13),	'V'},
-	{"voldown",	IMX_GPIO_NR(4, 5),	'v'},
-};
-
-/*
- * generate a null-terminated string containing the buttons pressed
- * returns number of keys pressed
- */
-static int read_keys(char *buf)
-{
-	int i, numpressed = 0;
-	for (i = 0; i < ARRAY_SIZE(buttons); i++) {
-		if (!gpio_get_value(buttons[i].gpnum))
-			buf[numpressed++] = buttons[i].ident;
-	}
-	buf[numpressed] = '\0';
-	return numpressed;
-}
-
-static int do_kbd(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-	char envvalue[ARRAY_SIZE(buttons)+1];
-	int numpressed = read_keys(envvalue);
-	setenv("keybd", envvalue);
-	return numpressed == 0;
-}
-
-
-U_BOOT_CMD(
-	kbd, 1, 1, do_kbd,
-	"Tests for keypresses, sets 'keybd' environment variable",
-	"Returns 0 (true) to shell if key is pressed."
-);
-static int change_blacklight_pwm(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-    uint32_t duty_cycle;
-    uint32_t period;
-    
-    if (argc > 2)
-    {
-        duty_cycle = simple_strtoul(argv[1], NULL, 10);
-        period = simple_strtoul(argv[2], NULL, 10);
-    
-        printf("change blacklight: \n    duty cycle: %u ns\n    period: %u ns\n", duty_cycle, period);
-        pwm_disable(LVDS_BACKLIGHT_PWM);
-        pwm_config(LVDS_BACKLIGHT_PWM, duty_cycle, period);
-        pwm_enable(LVDS_BACKLIGHT_PWM);
-    }
-    else
-    {
-        printf("change blacklight: too few arguments\n\n");
-        return 1;
-    }
-    
-    return 0;
-}
-
-static int change_blacklight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-    uint32_t enable;
-
-    if (argc > 1)
-    {
-        enable = (simple_strtoul(argv[1], NULL, 10) & 0x1);
-        printf("set blacklight enable to: %u\n\n", enable);
-        gpio_set_value(LVDS_BACKLIGHT_GP, enable);
-    }
-}
 
 static int send_receive_uart3(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
@@ -933,17 +899,7 @@ static int send_receive_uart3(cmd_tbl_t *cmdtp, int flag, int argc, char * const
     
 }
 
-U_BOOT_CMD(
-	blpwm, 3, 1, change_blacklight_pwm,
-	"Configure the blacklight pwm: blpwm duty_cycle_in_ns clock_period_in_ns",
-	"duty_cycle_in_ns clock_period_in_ns"
-);
 
-U_BOOT_CMD(
-	blen, 2, 1, change_blacklight_enable,
-	"Enable/disable the blacklight pwm: blen 1/0",
-	"1/0"
-);
 
 U_BOOT_CMD(
 	captouch, 2, 1, send_receive_uart3,
@@ -1020,7 +976,7 @@ void show_boot_progress(int progress)
 	if (progress > 0)
 		return;
 
-	enable_led(0, on_off);
-	enable_led(1, 0);
+	//enable_led(0, on_off);
+	//enable_led(1, 0);
 }
 #endif

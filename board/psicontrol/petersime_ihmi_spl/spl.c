@@ -18,10 +18,12 @@
 #include <asm/arch/crm_regs.h>
 #include <asm/imx-common/iomux-v3.h>
 #include <fsl_esdhc.h>
+#include <watchdog.h>
 #include "common.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
+extern int memory_regions_post_test(int flags);
 
 /* debug */
 static iomux_v3_cfg_t const uart1_pads[] = {
@@ -58,6 +60,7 @@ void board_init_f(ulong dummy)
 	enable_led(0, 1);	
 	enable_led(1, 1);
 	
+    int ret, i;
 	
 	gd = &gdata;
 	/*
@@ -75,10 +78,35 @@ void board_init_f(ulong dummy)
 	get_clocks();
 	preloader_console_init();
 
-	puts("board_init_f done, calling board_init_r!\n");
-	
-	memset(__bss_start, 0, __bss_end - __bss_start);
-	board_init_r(NULL, 0);
+    puts("calling memory test!\n");
+    
+    ret = memory_regions_post_test(0);
+    
+    if (!ret)
+    {    
+        puts("memory test ok, calling board_init_r!\n");
+        
+        memset(__bss_start, 0, __bss_end - __bss_start);
+        board_init_r(NULL, 0);
+    }
+    else
+    {
+        while (1)
+        {
+            puts("Memory NOK, hanging right here!\n");
+            
+            for (i = 0; i < 10; i++)
+            {        
+                WATCHDOG_RESET();    
+                
+                enable_led(0, i % 2);	
+                enable_led(1, 1 - (i % 2));
+                
+                udelay(100000);
+            }
+            
+        }
+    }
 }
 
 void spl_board_init(void)

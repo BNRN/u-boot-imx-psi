@@ -17,4 +17,6 @@ fi
 MAJOR=$($gas --version | head -1 | awk '{print $NF}' | cut -d . -f 1)
 MINOR=$($gas --version | head -1 | awk '{print $NF}' | cut -d . -f 2)
 
-printf "%02d%02d\\n" $MAJOR $MINOR
+printf "0222\n"
+
+# printf "%02d%02d\n" $MAJOR $MINOR

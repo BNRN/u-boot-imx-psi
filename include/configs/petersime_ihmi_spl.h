@@ -154,6 +154,7 @@
 #define CONFIG_SYS_I2C_RTC_ADDR		    0x68
 #define CONFIG_SYS_M41T11_BASE_YEAR     2000
 
+
 /* Eeprom */
 #define CONFIG_CMD_EEPROM
 /* these are for the ST M24C02 2kbit serial i2c eeprom */
@@ -184,7 +185,7 @@
 #define CONFIG_SPLASH_SCREEN /* enable splash screen */
 #define CONFIG_BMP_16BPP /* in 16BPP */
 #define CONFIG_IPUV3_CLK 43857143 /* dummy value, not actually true */
-#define CONFIG_CMD_BMP 
+#define CONFIG_CMD_BMP
 
 /* backlight PWM */
 #define CONFIG_PWM_IMX

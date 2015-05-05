@@ -108,7 +108,8 @@ int rtc_get (struct rtc_time *tmp)
 		tmp->tm_year =((int)cent*100)+bcd2bin(data[RTC_YEARS_ADDR]);
 	}
 #endif
-	tmp->tm_wday = bcd2bin (data[RTC_DAY_ADDR]  & 0x07);
+
+	tmp->tm_wday = bcd2bin ((data[RTC_DAY_ADDR] - 1)  & 0x07);
 	tmp->tm_yday = 0;
 	tmp->tm_isdst= 0;
 
@@ -132,7 +133,7 @@ int rtc_set (struct rtc_time *tmp)
 	data[RTC_HOUR_ADDR]   = bin2bcd(tmp->tm_hour) & 0x3F;/*handle cent stuff later*/
 	data[RTC_DATE_ADDR]   = bin2bcd(tmp->tm_mday) & 0x3F;
 	data[RTC_MONTH_ADDR]  = bin2bcd(tmp->tm_mon);
-	data[RTC_DAY_ADDR]    = bin2bcd(tmp->tm_wday) & 0x07;
+	data[RTC_DAY_ADDR]    = bin2bcd(tmp->tm_wday + 1) & 0x07;
 
 	data[RTC_HOUR_ADDR]   |= 0x80;/*we will always use CEB*/
 

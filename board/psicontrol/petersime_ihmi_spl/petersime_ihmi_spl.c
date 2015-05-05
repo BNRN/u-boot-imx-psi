@@ -460,9 +460,8 @@ static void setup_display(void)
 	writel(reg, &iomux->gpr[2]);
 
 	reg = readl(&iomux->gpr[3]);
-	reg = (reg & ~(IOMUXC_GPR3_LVDS0_MUX_CTL_MASK)
-	    | (IOMUXC_GPR3_MUX_SRC_IPU1_DI0
-	       <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET));
+	reg = ( (reg & ~(IOMUXC_GPR3_LVDS0_MUX_CTL_MASK))
+	       | (IOMUXC_GPR3_MUX_SRC_IPU1_DI0 <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET));
 	writel(reg, &iomux->gpr[3]);
 
 	/* backlight off for now */
@@ -502,7 +501,7 @@ static int change_backlight_pwm(cmd_tbl_t *cmdtp, int flag, int argc, char * con
     }
     else
     {
-        printf("change backlight: too few arguments\n\n");
+        printf("change backlight pwm: too few arguments\n\n");
         return 1;
     }
     
@@ -518,7 +517,14 @@ static int change_backlight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char * 
         enable = (simple_strtoul(argv[1], NULL, 10) & 0x1);
         printf("set backlight enable to: %u\n\n", enable);
         gpio_set_value(LVDS_BACKLIGHT_GP, enable);
+		return 0;
     }
+    else
+    {
+        printf("change backlight enable: too few arguments\n\n");
+        return 1;
+    }
+	
 }
 
 

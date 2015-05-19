@@ -91,10 +91,10 @@ void board_init_f(ulong dummy)
     }
     else
     {
+        puts("memory test failed!");
+    
         while (1)
-        {
-            puts("Memory NOK, hanging right here!\n");
-            
+        {            
             for (i = 0; i < 10; i++)
             {        
                 WATCHDOG_RESET();    

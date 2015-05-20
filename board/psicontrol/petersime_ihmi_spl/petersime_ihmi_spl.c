@@ -172,8 +172,13 @@ int board_eth_init(bd_t *bis)
 
 	setup_iomux_enet();
 	
-	// TODO: enable voor de omgebouwde boards
-	//enable_enet_clk(1);
+	// ENKEL VOOR OMGEBOUWDE BOARDS
+    char* enable_enet_clk_env = getenv("enable_enet_clk");
+	if (NULL != enable_enet_clk_env && 0 == strcmp(enable_enet_clk_env, "1"))
+    {
+        printf("Enabling i.MX6 Ethernet clock\n");
+        enable_enet_clk(1);        
+    }
 
 	bus = fec_get_miibus(base, -1);
 	if (!bus)

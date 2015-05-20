@@ -96,16 +96,30 @@
 #define CONFIG_ENV_SIZE			(64 * 1024)
 #define CONFIG_ENV_OFFSET		(8128 * 1024)
 
+/* Boot */
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+#define CONFIG_LOADADDR			0x12000000
+#define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
+#define CONFIG_CMDLINE_TAG		/* enable passing of ATAGs */
+#define CONFIG_SYS_BOOTMAPSZ	        (8 << 20)
+#define CONFIG_SETUP_MEMORY_TAGS
+#define CONFIG_INITRD_TAG
+#define CONFIG_REVISION_TAG
+
 #define CONFIG_EXTRA_ENV_SETTINGS \
     "autoload=no\0" \
     "autostart=no\0" \
+    "loadaddr=0x12000000\0" \
+    "fdtaddr=11000000\0" \
 	"console=ttymxc1\0" \
     "enable_pdp_panel=0\0" \
+	"fdt_high=0xffffffff\0" \
+    "enable_enet_clk=0\0" \
 	"ethaddr=00:04:9f:00:ea:d4\0" \
 	"fec_addr=00:04:9f:00:ea:d4\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1;\0" \
-    "bootcmd=fatload mmc 0 11000000 /petersime_ihmi.dtb;" \
-        "fatload mmc 0 12000000 /uImage;bootm 12000000 - 11000000;\0" \
+    "bootcmd=fatload mmc 0 ${fdtaddr} /petersime_ihmi.dtb;" \
+        "fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdtaddr};\0" \
     "image=testbeeld4.bmp\0" \
     "loadimage=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
 
@@ -190,16 +204,6 @@
 /* backlight PWM */
 #define CONFIG_PWM_IMX
 #define CONFIG_IMX6_PWM_PER_CLK	66000000
-
-/* Boot */
-#define CONFIG_ZERO_BOOTDELAY_CHECK
-#define CONFIG_LOADADDR			0x10800000
-#define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
-#define CONFIG_CMDLINE_TAG		/* enable passing of ATAGs */
-#define CONFIG_SYS_BOOTMAPSZ	        (8 << 20)
-#define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_INITRD_TAG
-#define CONFIG_REVISION_TAG
 
 /* misc */
 #define CONFIG_SYS_GENERIC_BOARD

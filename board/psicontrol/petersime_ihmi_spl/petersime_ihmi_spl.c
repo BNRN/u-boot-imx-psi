@@ -169,6 +169,7 @@ int board_eth_init(bd_t *bis)
 	struct mii_dev *bus = NULL;
 	struct phy_device *phydev = NULL;
 	int ret;
+	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
 
 	setup_iomux_enet();
 	
@@ -177,7 +178,15 @@ int board_eth_init(bd_t *bis)
 	if (NULL != enable_enet_clk_env && 0 == strcmp(enable_enet_clk_env, "1"))
     {
         printf("Enabling i.MX6 Ethernet clock\n");
-        enable_enet_clk(1);        
+        
+        // enable enet clock gating (on for all power modes)
+        enable_enet_clk(1);  
+        
+        // set PLL at 50 MHz
+        enable_fec_anatop_clock(ENET_50MHz);
+        
+        // enable PLL (set gpr1[ENET_CLK_SEL])
+        setbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);          
     }
 
 	bus = fec_get_miibus(base, -1);

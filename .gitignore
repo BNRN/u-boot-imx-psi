@@ -83,3 +83,7 @@ GTAGS
 *.orig
 *~
 \#*#
+
+localversion
+verkerk_spl_firmware
+spl.img

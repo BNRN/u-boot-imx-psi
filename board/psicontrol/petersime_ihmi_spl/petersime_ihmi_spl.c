@@ -94,13 +94,11 @@ int board_ehci_power(int port, int on)
 	return 0;
 }
 
-#define OUTPUT_40OHM (PAD_CTL_SPEED_MED|PAD_CTL_DSE_40ohm)
-
 static iomux_v3_cfg_t const usb_otg_pads[] = {
 	MX6_PAD_GPIO_1__USB_OTG_ID		| MUX_PAD_CTRL(WEAK_PULLUP),
 	MX6_PAD_EIM_D21__USB_OTG_OC		| MUX_PAD_CTRL(WEAK_PULLUP),
 	/* OTG Power enable */
-	MX6_PAD_EIM_D22__GPIO3_IO22		| MUX_PAD_CTRL(OUTPUT_40OHM)
+	MX6_PAD_EIM_D22__GPIO3_IO22		| MUX_PAD_CTRL(WEAK_PULLDOWN)
 };
 
 static void setup_usb_otg(void)
@@ -196,7 +194,7 @@ int board_eth_init(bd_t *bis)
 	    return -ENOMEM;
     }
 	/* check if phy registers are readable through RMII */
-	phydev = phy_find_by_mask(bus, (0x0001 << CONFIG_FEC_MXC_PHYADDR), PHY_INTERFACE_MODE_RGMII);
+	phydev = phy_find_by_mask(bus, (0x0001 << CONFIG_FEC_MXC_PHYADDR), PHY_INTERFACE_MODE_RMII);
 	if (!phydev) {
 		printf("%s: can not find micrel switch\n", __func__);
 		free(bus);

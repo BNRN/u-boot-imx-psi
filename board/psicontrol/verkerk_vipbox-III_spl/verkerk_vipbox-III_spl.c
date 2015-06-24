@@ -99,17 +99,15 @@ static iomux_v3_cfg_t const usb_otg_pads[] = {
 	MX6_PAD_GPIO_1__USB_OTG_ID		| MUX_PAD_CTRL(WEAK_PULLUP),
 	MX6_PAD_EIM_D21__USB_OTG_OC		| MUX_PAD_CTRL(WEAK_PULLUP),
 	/* OTG Power enable */
-	MX6_PAD_EIM_D22__GPIO3_IO22		| MUX_PAD_CTRL(OUTPUT_40OHM)
+	MX6_PAD_EIM_D22__GPIO3_IO22		| MUX_PAD_CTRL(WEAK_PULLDOWN)
 };
 
 static void setup_usb_otg(void)
 {
-	/* initialise USB OTG ID line */
+/* initialise USB OTG ID line     */
 	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
 
-	clrsetbits_le32(&iomuxc_regs->gpr[1],
-			IOMUXC_GPR1_OTG_ID_MASK,
-			IOMUXC_GPR1_OTG_ID_GPIO1);
+	clrsetbits_le32(&iomuxc_regs->gpr[1],IOMUXC_GPR1_OTG_ID_MASK,IOMUXC_GPR1_OTG_ID_GPIO1);
 
 	imx_iomux_v3_setup_multiple_pads(usb_otg_pads, ARRAY_SIZE(usb_otg_pads));
 }
@@ -144,6 +142,11 @@ static iomux_v3_cfg_t const enet_pads[] = {
 static void setup_iomux_enet(void)
 {
 	imx_iomux_v3_setup_multiple_pads(enet_pads, ARRAY_SIZE(enet_pads));
+    
+    /* Reset Micrel KSZ8081 PHY */
+	gpio_direction_output(IMX_GPIO_NR(6, 11) , 0);
+	udelay(500);
+	gpio_set_value(IMX_GPIO_NR(6, 11), 1);
 }
 
 int board_phy_config(struct phy_device *phydev)

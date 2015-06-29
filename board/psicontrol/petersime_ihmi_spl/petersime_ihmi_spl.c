@@ -260,6 +260,13 @@ static int detect_chimei(struct display_info_t const *dev)
 	return (NULL != panel && 0 == strcmp(panel, "1"));
 }
 
+static int detect_chefree_7in(struct display_info_t const *dev)
+{
+    char* panel = getenv("enable_7in_panel");
+    //printf("detecting PDP panel: %s\n", panel);
+	return (NULL != panel && 0 == strcmp(panel, "1"));
+}
+
 static void enable_lvds(struct display_info_t const *dev)
 {
 	struct iomuxc *iomux = (struct iomuxc *)
@@ -301,13 +308,33 @@ struct display_info_t const displays[] = {{
 		.refresh        = 60,
 		.xres           = 800,
 		.yres           = 600,
-		.pixclock       = 25000,
+		.pixclock       = 25000, /* 40 MHz */
 		.left_margin    = 156,
 		.right_margin   = 100,
 		.upper_margin   = 145,
 		.lower_margin   = 18,
 		.hsync_len      = 60,
 		.vsync_len      = 145,
+		.sync           = FB_SYNC_EXT,
+		.vmode          = FB_VMODE_NONINTERLACED
+} }, {
+	.bus	= 0,
+	.addr	= 1,
+	.pixfmt	= IPU_PIX_FMT_LVDS666,
+	.detect	= detect_chefree_7in,
+	.enable	= enable_lvds,
+	.mode	= {
+		.name           = "Texim Chefree CH070DLDL-RT2",
+		.refresh        = 60,
+		.xres           = 800,
+		.yres           = 480,
+		.pixclock       = 30303, /* 33 MHz = 30303 */
+		.left_margin    = 128,
+		.right_margin   = 128,
+		.upper_margin   = 22,
+		.lower_margin   = 23,
+		.hsync_len      = 60,
+		.vsync_len      = 22,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
 /*} }, {
@@ -432,7 +459,7 @@ static void setup_display(void)
 	reg |=  MXC_CCM_CCGR3_LDB_DI0_MASK;
 	writel(reg, &mxc_ccm->CCGR3);
         
-    if (detect_chimei(NULL)) 
+    if (detect_chimei(NULL) || detect_chefree_7in(NULL)) 
     {
         /* set LDB0 clk select to 001 -> select PFD0 306,58 MHz */
         /* then divide by 7 -> 43,7 MHz */

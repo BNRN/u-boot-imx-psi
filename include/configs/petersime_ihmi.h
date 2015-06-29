@@ -316,7 +316,7 @@
 	"ethaddr=00:04:9f:00:ea:d4\0" \
 	"fec_addr=00:04:9f:00:ea:d4\0" \
     "bootcmd_emc=run emcscript_start;\0" \
-    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1;\0" \
+    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1\0" \
     "bootcmd_no_emc=fatload mmc 0 11000000 /petersime_ihmi.dtb;" \
         "fatload mmc 0 12000000 /uImage;bootm 12000000 - 11000000;\0" \
     "bootcmd=\0" \

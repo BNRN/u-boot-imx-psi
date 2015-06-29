@@ -113,11 +113,13 @@
     "fdtaddr=11000000\0" \
 	"console=ttymxc1\0" \
     "enable_pdp_panel=0\0" \
+    "enable_7in_panel=0\0" \
 	"fdt_high=0xffffffff\0" \
     "enable_enet_clk=0\0" \
 	"ethaddr=00:04:9f:00:ea:d4\0" \
 	"fec_addr=00:04:9f:00:ea:d4\0" \
-    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1;\0" \
+    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1\0" \
+    "bootargs_7in=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1 video=mxcfb0:dev=ldb,800x480M@61,if=RGB666\0" \
     "bootcmd=fatload mmc 0 ${fdtaddr} /petersime_ihmi.dtb;" \
         "fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdtaddr};\0" \
     "image=testbeeld4.bmp\0" \

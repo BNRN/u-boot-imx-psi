@@ -9,7 +9,7 @@
 #include <asm/arch/mx6-pins.h>
 #include <asm/arch/clock.h>
 
-#define UART_PAD_CTRL  (PAD_CTL_PUS_47K_UP |	\
+#define UART_PAD_CTRL  (PAD_CTL_PUS_100K_UP |	\
 			PAD_CTL_SPEED_LOW | PAD_CTL_DSE_40ohm |	\
 			PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
 

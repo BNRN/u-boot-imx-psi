@@ -107,7 +107,7 @@ int board_mmc_getcd(struct mmc *mmc)
 
 #ifdef CONFIG_MXC_SPI
 #define SPI_PAD_CTRL (PAD_CTL_HYS | PAD_CTL_SPEED_MED |		\
-	PAD_CTL_DSE_40ohm     | PAD_CTL_SRE_FAST)
+	PAD_CTL_DSE_120ohm     | PAD_CTL_SRE_FAST)
 
 static iomux_v3_cfg_t const ecspi_pads[] = {
     /* SS0 */

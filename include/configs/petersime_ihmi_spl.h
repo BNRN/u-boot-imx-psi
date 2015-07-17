@@ -124,6 +124,12 @@
         "fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdtaddr};\0" \
     "image=testbeeld4.bmp\0" \
     "loadimage=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
+	"reflash_uboot=sf probe;" \
+		"setenv serverip 10.0.182.252;" \
+		"sf erase 0x00 +0x7D400;" \
+		"tftpboot 0x11000000 petersime_spl_firmware;" \
+		"sf write 0x11000000 0x400 0x7D000\0"
+		
 
 #define CONFIG_BOOTCOMMAND \
 	"run setboottypem; run boot"
@@ -219,5 +225,12 @@
 #define CONFIG_SPL_MMC_SUPPORT
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x80 /* offset 64 kb */
 #define CONFIG_SYS_MONITOR_LEN	(CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS / 2 * 1024)
+
+#define CONFIG_SPL_SPI_SUPPORT
+#define CONFIG_SPL_SPI_FLASH_SUPPORT
+#define CONFIG_SYS_SPI_U_BOOT_OFFS	(64 * 1024)
+#define CONFIG_SPL_SPI_LOAD
+
+
 
 #endif	/* __CONFIG_CM_FX6_H */

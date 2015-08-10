@@ -110,7 +110,7 @@
 	"loadimage=load mmc 0 ${loadaddr} /${bootfile}\0" \
 	"loadrd=load mmc 0 ${rdaddr} /${rdfile}; setenv rdsize ${filesize}\0" \
 	"loadfdt=echo loading /${fdt_file} ...;  load mmc 0 ${fdt_addr} /${fdt_file}\0" \
-    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1;\0" \
+    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk2p2 rootwait\0" \
     "mmcboot=run update_uenv; run uname_boot;\0" \
     "update_uenv=echo Checking for: /uEnv.txt ...;" \
 			"if test -e mmc 0 /uEnv.txt; then " \

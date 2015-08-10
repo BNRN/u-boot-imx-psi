@@ -10,7 +10,7 @@
 #include <asm/arch/clock.h>
 
 #define UART_PAD_CTRL  (PAD_CTL_PUS_100K_UP |	\
-			PAD_CTL_SPEED_LOW | PAD_CTL_DSE_40ohm |	\
+			PAD_CTL_SPEED_LOW | PAD_CTL_DSE_120ohm |	\
 			PAD_CTL_SRE_FAST  | PAD_CTL_HYS)
 
 #define WEAK_PULLUP	(PAD_CTL_PUS_100K_UP |			\

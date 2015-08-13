@@ -34,7 +34,7 @@
 #include <input.h>
 #include <netdev.h>
 #include <usb/ehci-fsl.h>
-//#include <UART3.h>
+#include "UART3.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 #define GP_USB_OTG_PWR	IMX_GPIO_NR(3, 22)
@@ -269,6 +269,7 @@ static void enable_led(unsigned number, unsigned on_off)
     
 }
 
+/*
 static iomux_v3_cfg_t const led_pads[] = {
 	MX6_PAD_NANDF_D0__GPIO2_IO00 | MUX_PAD_CTRL(WEAK_PULLUP),
 	MX6_PAD_NANDF_D5__GPIO2_IO05 | MUX_PAD_CTRL(WEAK_PULLUP),
@@ -279,8 +280,7 @@ static void setup_iomux_leds(void)
 {
 	imx_iomux_v3_setup_multiple_pads(led_pads, ARRAY_SIZE(led_pads));
 }
-
-
+*/
 
 #ifdef CONFIG_USB_EHCI_MX6
 int board_ehci_hcd_init(int port)
@@ -680,9 +680,8 @@ static void setup_display(void)
 	writel(reg, &iomux->gpr[2]);
 
 	reg = readl(&iomux->gpr[3]);
-	reg = (reg & ~(IOMUXC_GPR3_LVDS0_MUX_CTL_MASK)
-	    | (IOMUXC_GPR3_MUX_SRC_IPU1_DI0
-	       <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET));
+	reg = (reg & ~(IOMUXC_GPR3_LVDS0_MUX_CTL_MASK)) |
+		  (IOMUXC_GPR3_MUX_SRC_IPU1_DI0 <<IOMUXC_GPR3_LVDS0_MUX_CTL_OFFSET);
 	writel(reg, &iomux->gpr[3]);
 
 	/* backlight off for now */
@@ -738,7 +737,9 @@ static int change_blacklight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char *
         enable = (simple_strtoul(argv[1], NULL, 10) & 0x1);
         printf("set blacklight enable to: %u\n\n", enable);
         gpio_set_value(LVDS_BACKLIGHT_GP, enable);
+        return 0;
     }
+    return 1;
 }
 
 
@@ -894,9 +895,9 @@ static int send_receive_uart3(cmd_tbl_t *cmdtp, int flag, int argc, char * const
         }
         
         puts("\n\n");
-        
+        return 0;
     }
-    
+    return 1;
 }
 
 

@@ -15,7 +15,7 @@ make ARCH=arm CROSS_COMPILE=${CC} env
 
 ./tools/mkimage -n board/psicontrol/verkerk_vipbox-III_spl/verkerk_vipbox-III.cfg.cfgtmp -T imximage -e 0x00908000 -d spl/u-boot-spl.bin spl.img
 
-dd if=/dev/zero count=500 bs=1K | tr '\000' '\377' > verkerk_spl_firmware
-dd if=spl.img of=verkerk_spl_firmware bs=1K conv=notrunc && dd if=u-boot.img of=verkerk_spl_firmware bs=1K seek=63 conv=notrunc
+dd if=/dev/zero count=500 bs=1K | tr '\000' '\377' > verkerk_spl_firmware.bin
+dd if=spl.img of=verkerk_spl_firmware.bin bs=1K conv=notrunc && dd if=u-boot.img of=verkerk_spl_firmware.bin bs=1K seek=63 conv=notrunc
 
 #mv u-boot.imx u-boot_petersime.imx

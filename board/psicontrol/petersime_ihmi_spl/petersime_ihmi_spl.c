@@ -248,6 +248,9 @@ static iomux_v3_cfg_t const backlight_pads[] = {
     /* BL_EN */
 	MX6_PAD_DISP0_DAT10__GPIO4_IO31		| MUX_PAD_CTRL(OUTPUT_40OHM),
 #define LVDS_BACKLIGHT_GP IMX_GPIO_NR(4, 31)
+    /* 12V_EN */
+	MX6_PAD_DISP0_DAT22__GPIO5_IO16		| MUX_PAD_CTRL(OUTPUT_40OHM),
+#define LVDS_BACKLIGHT_12V_EN IMX_GPIO_NR(5, 16)
     /* PWM */
 	MX6_PAD_DISP0_DAT9__PWM2_OUT		| MUX_PAD_CTRL(WEAK_PULLUP)
 #define LVDS_BACKLIGHT_PWM  1
@@ -274,7 +277,7 @@ static void enable_lvds(struct display_info_t const *dev)
 	u32 reg = readl(&iomux->gpr[2]);
 	reg |= IOMUXC_GPR2_DATA_WIDTH_CH0_24BIT;
 	writel(reg, &iomux->gpr[2]);
-	gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
+	
 }
 
 struct display_info_t const displays[] = {{
@@ -445,6 +448,27 @@ int board_cfb_skip(void)
 	return NULL != getenv("novideo");
 }
 
+/* use late init to guarantee delay between LVDS enable and backlight enable */
+int board_late_init(void)
+{	
+	if (! board_cfb_skip())
+	{
+		// min 200ms required delay between lvds enable and 12V enable according to specs (T3)
+		udelay(300000);
+		gpio_direction_output(LVDS_BACKLIGHT_12V_EN, 1);
+		
+		// min 10ms required delay between 12V enable and PWM enable according to specs (T4)
+		udelay(15000);	
+		pwm_enable(LVDS_BACKLIGHT_PWM);
+		
+		// min 10ms required delay between pwm enable and backlight enable according to specs (T5)
+		udelay(15000);	
+		gpio_direction_output(LVDS_BACKLIGHT_GP, 1);	
+	}
+	
+	return 0;
+}
+
 static void setup_display(void)
 {
 	struct mxc_ccm_reg *mxc_ccm = (struct mxc_ccm_reg *)CCM_BASE_ADDR;
@@ -508,7 +532,8 @@ static void setup_display(void)
 	/* backlight off for now */
 	imx_iomux_v3_setup_multiple_pads(backlight_pads,
 					 ARRAY_SIZE(backlight_pads));
-	gpio_direction_input(LVDS_BACKLIGHT_GP);
+	gpio_direction_output(LVDS_BACKLIGHT_GP, 0);
+	gpio_direction_output(LVDS_BACKLIGHT_12V_EN, 0);
     
     pwm_init(LVDS_BACKLIGHT_PWM, 0, 0);
     if (detect_chimei(NULL)) 
@@ -521,7 +546,6 @@ static void setup_display(void)
         /* Chefree is 20 KHz */
         pwm_config(LVDS_BACKLIGHT_PWM, 40000, 50000);
     }
-    pwm_enable(LVDS_BACKLIGHT_PWM);
 }
 
 

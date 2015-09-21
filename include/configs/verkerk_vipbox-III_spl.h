@@ -97,7 +97,7 @@
     "autoload=no\0" \
     "image=zImage\0" \
     "bootfile=vmlinuz-default\0" \
-	"fdt_file=verkerk_vipbox-III_default.dtb\0" \
+	"fdt_file=verkerk_vipbox-III_san_driver.dtb\0" \
 	"fdt_addr=0x18000000\0" \
 	"fdt_high=0xffffffff\0"	  \
 	"initrd_high=0xffffffff\0" \
@@ -110,7 +110,7 @@
 	"loadimage=load mmc 0 ${loadaddr} /${bootfile}\0" \
 	"loadrd=load mmc 0 ${rdaddr} /${rdfile}; setenv rdsize ${filesize}\0" \
 	"loadfdt=echo loading /${fdt_file} ...;  load mmc 0 ${fdt_addr} /${fdt_file}\0" \
-    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk2p2 rootwait\0" \
+    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk2p2 rootwait rootfstype=ext4\0" \
     "mmcboot=run update_uenv; run uname_boot;\0" \
     "update_uenv=echo Checking for: /uEnv.txt ...;" \
 			"if test -e mmc 0 /uEnv.txt; then " \
@@ -143,9 +143,6 @@
             "if test -e mmc 0 /${rdfile}; then " \
 				"echo loading /${rdfile} ...; "\
 				"run loadrd;" \
-				"if test -n ${uuid}; then " \
-					"setenv mmcroot UUID=${uuid} ro;" \
-				"fi;" \
 				"echo debug: [${bootargs}] ... ;" \
 				"echo debug: [bootz ${loadaddr} ${rdaddr}:${rdsize} ${fdt_addr}] ... ;" \
 				"bootz ${loadaddr} ${rdaddr}:${rdsize} ${fdt_addr}; " \
@@ -155,7 +152,12 @@
 				"bootz ${loadaddr} - ${fdt_addr}; " \
 			"fi;" \
 		"fi;\0" \
-    "bootcmd=run mmcboot;\0"
+    "bootcmd=run save_env_first_boot; run mmcboot;\0" \
+    "environment_written=0\0" \
+    "save_env_first_boot=if test -n ${environment_written}; then " \
+    "setenv environment_written 1;" \
+    "saveenv;" \
+    "fi;\0"
 
 
 /* Ethernet */

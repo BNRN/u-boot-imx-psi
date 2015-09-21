@@ -218,6 +218,7 @@
 #define CONFIG_STACKSIZE			(128 * 1024)
 #define CONFIG_SYS_MALLOC_LEN			(10 * 1024 * 1024)
 #define CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS	800 /* 400 KB */
+#define CONFIG_BOARD_LATE_INIT   /* use late init to guarantee delay between LVDS enable and backlight enable */
 
 /* SPL */
 #include "imx6_spl.h"

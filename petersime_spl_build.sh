@@ -4,7 +4,7 @@ export CC=/opt/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/bin/arm-linux-gn
 export PRODUCT_ID_NUMBER=14081  #<product_id_number>
 export PRODUCT_VERSION_NUMBER=0      #<product_version_number>
 export PRODUCT_REVISION_NUMBER=0      #<product_revision_number>
-export PRODUCT_TEST_NUMBER=2      #<product_test_number>
+export PRODUCT_TEST_NUMBER=3      #<product_test_number>
 
 echo ": psiversion: $PRODUCT_ID_NUMBER.$PRODUCT_VERSION_NUMBER.$PRODUCT_REVISION_NUMBER.$PRODUCT_TEST_NUMBER" > localversion
 
@@ -15,7 +15,7 @@ make ARCH=arm CROSS_COMPILE=${CC} env
 
 ./tools/mkimage -n board/psicontrol/petersime_ihmi_spl/petersime_ihmi.cfg.cfgtmp -T imximage -e 0x00908000 -d spl/u-boot-spl.bin spl.img
 
-dd if=/dev/zero count=500 bs=1K | tr '\000' '\377' > petersime_spl_firmware
-dd if=spl.img of=petersime_spl_firmware bs=1K conv=notrunc && dd if=u-boot.img of=petersime_spl_firmware bs=1K seek=63 conv=notrunc
+dd if=/dev/zero count=500 bs=1K | tr '\000' '\377' > petersime_spl_firmware.bin
+dd if=spl.img of=petersime_spl_firmware.bin bs=1K conv=notrunc && dd if=u-boot.img of=petersime_spl_firmware.bin bs=1K seek=63 conv=notrunc
 
 #mv u-boot.imx u-boot_petersime.imx

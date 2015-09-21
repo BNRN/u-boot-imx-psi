@@ -118,14 +118,19 @@
     "enable_enet_clk=0\0" \
 	"ethaddr=00:04:9f:00:ea:d4\0" \
 	"fec_addr=00:04:9f:00:ea:d4\0" \
+    "serverip=10.0.182.252\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1\0" \
     "bootargs_7in=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1 video=mxcfb0:dev=ldb,800x480M@61,if=RGB666\0" \
-    "bootcmd=fatload mmc 0 ${fdtaddr} /petersime_ihmi.dtb;" \
+    "bootcmd=run save_env_first_boot; fatload mmc 0 ${fdtaddr} /petersime_ihmi.dtb;" \
         "fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdtaddr};\0" \
     "image=testbeeld4.bmp\0" \
     "loadimage=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
+    "environment_written=0\0" \
+    "save_env_first_boot=if test -n ${environment_written}; then " \
+    "setenv environment_written 1;" \
+    "saveenv;" \
+    "fi;\0" \
 	"reflash_uboot=sf probe;" \
-		"setenv serverip 10.0.182.252;" \
 		"sf erase 0x00 +0x7D400;" \
 		"tftpboot 0x11000000 petersime_spl_firmware;" \
 		"sf write 0x11000000 0x400 0x7D000\0"

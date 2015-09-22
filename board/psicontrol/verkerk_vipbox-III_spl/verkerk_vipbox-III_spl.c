@@ -319,6 +319,9 @@ static iomux_v3_cfg_t const gpio_pads[] = {
     // AUDIO REN & TEN
         MX6_PAD_DISP0_DAT11__GPIO5_IO05  | MUX_PAD_CTRL(NO_PAD_CTRL),
         MX6_PAD_DISP0_DAT12__GPIO5_IO06  | MUX_PAD_CTRL(NO_PAD_CTRL),
+        
+    // TESTPIN
+        MX6_PAD_CSI0_DAT19__GPIO6_IO05  | MUX_PAD_CTRL(NO_PAD_CTRL),
 };
 
 void setup_gpio_pads(void)

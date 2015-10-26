@@ -241,6 +241,8 @@ static int pfuze_init(void) {}
 
 #if defined(CONFIG_VIDEO_IPUV3)
 
+#define OUTPUT_40OHM (PAD_CTL_SPEED_MED|PAD_CTL_DSE_40ohm)
+
 static iomux_v3_cfg_t const backlight_pads[] = {
 	/* Backlight on LVDS connector */
     /* BL_EN */

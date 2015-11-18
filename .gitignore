@@ -87,3 +87,5 @@ GTAGS
 localversion
 verkerk_spl_firmware
 spl.img
+niko_spl_firmware
+petersime_spl_firmware_with_memory_errors

@@ -110,7 +110,7 @@
     "autoload=no\0" \
     "autostart=no\0" \
     "loadaddr=0x12000000\0" \
-    "fdtaddr=11000000\0" \
+    "fdt_addr=11000000\0" \
 	"console=ttymxc1\0" \
     "enable_pdp_panel=0\0" \
     "enable_7in_panel=0\0" \
@@ -119,12 +119,15 @@
 	"ethaddr=00:04:9f:00:ea:d4\0" \
 	"fec_addr=00:04:9f:00:ea:d4\0" \
     "serverip=10.0.182.252\0" \
+    "fdt_file_name=hmi_board.dtb\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1\0" \
+    "bootargs_usb=console=ttymxc0,115200 root=/dev/sda2 rootwait galcore.gpuProfiler=1\0" \
     "bootargs_7in=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1 video=mxcfb0:dev=ldb,800x480M@61,if=RGB666\0" \
-    "bootcmd=run save_env_first_boot; fatload mmc 0 ${fdtaddr} /petersime_ihmi.dtb;" \
-        "fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdtaddr};\0" \
-    "image=testbeeld4.bmp\0" \
+    "bootcmd=run save_env_first_boot; run bootcmd_mmc; run bootcmd_usb; run loadimage;\0" \
+    "image=petersime.bmp\0" \
     "loadimage=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
+    "bootcmd_mmc=fatload mmc 0 ${fdt_addr} /${fdt_file_name};fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
+    "bootcmd_usb=usb start;setenv bootargs ${bootargs_usb};fatload usb 0:1 ${fdt_addr} /${fdt_file_name};fatload usb 0:1 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "environment_written=0\0" \
     "save_env_first_boot=if test -n ${environment_written}; then " \
     "setenv environment_written 1;" \
@@ -132,7 +135,7 @@
     "fi;\0" \
 	"reflash_uboot=sf probe;" \
 		"sf erase 0x00 +0x7D400;" \
-		"tftpboot 0x11000000 petersime_spl_firmware;" \
+		"tftpboot 0x11000000 petersime_spl_firmware.bin;" \
 		"sf write 0x11000000 0x400 0x7D000\0"
 		
 

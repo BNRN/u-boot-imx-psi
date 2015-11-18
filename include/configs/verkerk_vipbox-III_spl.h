@@ -154,7 +154,7 @@
 		"fi;\0" \
     "bootcmd=run save_env_first_boot; run mmcboot;\0" \
     "environment_written=0\0" \
-    "save_env_first_boot=if test -n ${environment_written}; then " \
+    "save_env_first_boot=if test ${environment_written} != \"1\"; then " \
     "setenv environment_written 1;" \
     "saveenv;" \
     "fi;\0"

@@ -129,7 +129,7 @@
     "bootcmd_mmc=fatload mmc 0 ${fdt_addr} /${fdt_file_name};fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "bootcmd_usb=usb start;setenv bootargs ${bootargs_usb};fatload usb 0:1 ${fdt_addr} /${fdt_file_name};fatload usb 0:1 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "environment_written=0\0" \
-    "save_env_first_boot=if test -n ${environment_written}; then " \
+    "save_env_first_boot=if test ${environment_written} != \"1\"; then " \
     "setenv environment_written 1;" \
     "saveenv;" \
     "fi;\0" \

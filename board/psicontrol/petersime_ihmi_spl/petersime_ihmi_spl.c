@@ -137,6 +137,9 @@ static iomux_v3_cfg_t const enet_pads[] = {
 	
 	/* Micrel KS8873 switch Reset */
 	MX6_PAD_NANDF_CS0__GPIO6_IO11	| MUX_PAD_CTRL(NO_PAD_CTRL),
+    
+	/* Touch Controller Reset */
+    MX6_PAD_NANDF_RB0__GPIO6_IO10   | MUX_PAD_CTRL(NO_PAD_CTRL),
 	
 };
 

@@ -123,9 +123,10 @@
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1\0" \
     "bootargs_usb=console=ttymxc0,115200 root=/dev/sda2 rootwait galcore.gpuProfiler=1\0" \
     "bootargs_7in=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1 video=mxcfb0:dev=ldb,800x480M@61,if=RGB666\0" \
-    "bootcmd=run save_env_first_boot; run bootcmd_mmc; run bootcmd_usb; run loadimage;\0" \
+    "bootcmd=run save_env_first_boot; run bootcmd_mmc; run bootcmd_usb; run loadimage_sf;\0" \
     "image=petersime.bmp\0" \
-    "loadimage=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
+    "loadimage_mmc=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
+    "loadimage_sf=sf probe; sf read 0x11000000 0x200000 0x400000; bmp disp 11000000\0" \
     "bootcmd_mmc=fatload mmc 0 ${fdt_addr} /${fdt_file_name};fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "bootcmd_usb=usb start;setenv bootargs ${bootargs_usb};fatload usb 0:1 ${fdt_addr} /${fdt_file_name};fatload usb 0:1 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "environment_written=0\0" \

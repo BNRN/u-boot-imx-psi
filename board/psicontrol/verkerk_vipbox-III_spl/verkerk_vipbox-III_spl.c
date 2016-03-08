@@ -70,13 +70,29 @@ static struct i2c_pads_info i2c_pad_info2 = {
 		.gp = IMX_GPIO_NR(3, 18)
 	}
 };	
+
+
+/* I2C4 san rf */
+static struct i2c_pads_info i2c_pad_info3 = {
+	.scl = {
+		.i2c_mode = MX6_PAD_GPIO_7__I2C4_SCL | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = MX6_PAD_GPIO_7__GPIO1_IO07 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(3, 17)
+	},
+	.sda = {
+		.i2c_mode = MX6_PAD_GPIO_8__I2C4_SDA | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gpio_mode = MX6_PAD_GPIO_8__GPIO1_IO08 | MUX_PAD_CTRL(I2C_PAD_CTRL),
+		.gp = IMX_GPIO_NR(3, 18)
+	}
+};	
 		
 
 static void verkerk_vipbox_spl_setup_i2c(void)
 {
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0); // eeprom
 	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1); // PMIC
-	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2); // testpad
+	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2); // audio
+	setup_i2c(3, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info3); // san rf
 }
 #else
 static void verkerk_vipbox_spl_setup_i2c(void) { }

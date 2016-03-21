@@ -2,9 +2,9 @@
 export CC=/opt/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/bin/arm-linux-gnueabihf-
 
 export PRODUCT_ID_NUMBER=14081  #<product_id_number>
-export PRODUCT_VERSION_NUMBER=1      #<product_version_number>
-export PRODUCT_REVISION_NUMBER=1      #<product_revision_number>
-export PRODUCT_TEST_NUMBER=0      #<product_test_number>
+export PRODUCT_VERSION_NUMBER=0      #<product_version_number>
+export PRODUCT_REVISION_NUMBER=0      #<product_revision_number>
+export PRODUCT_TEST_NUMBER=5      #<product_test_number>
 
 echo ": psiversion: $PRODUCT_ID_NUMBER.$PRODUCT_VERSION_NUMBER.$PRODUCT_REVISION_NUMBER.$PRODUCT_TEST_NUMBER" > localversion
 

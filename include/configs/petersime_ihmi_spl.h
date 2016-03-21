@@ -127,7 +127,7 @@
     "image=petersime.bmp\0" \
     "loadimage_mmc=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
     "loadimage_sf=sf probe; sf read 0x11000000 0x200000 0x400000; bmp disp 11000000\0" \
-    "bootcmd_mmc=fatload mmc 0 ${fdt_addr} /${fdt_file_name};fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
+    "bootcmd_mmc=mii write 1 0 1820;mii write 2 0 1820;fatload mmc 0 ${fdt_addr} /${fdt_file_name};fatload mmc 0 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "bootcmd_usb=usb start;setenv bootargs ${bootargs_usb};fatload usb 0:1 ${fdt_addr} /${fdt_file_name};fatload usb 0:1 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "environment_written=0\0" \
     "save_env_first_boot=if test ${environment_written} != \"1\"; then " \
@@ -135,9 +135,9 @@
     "saveenv;" \
     "fi;\0" \
 	"reflash_uboot=sf probe;" \
-		"sf erase 0x00 +0x7D400;" \
+		"sf erase 0x00 +0x600000;" \
 		"tftpboot 0x11000000 petersime_spl_firmware.bin;" \
-		"sf write 0x11000000 0x400 0x7D000\0"
+		"sf write 0x11000000 0x0 0x600000\0"
 		
 
 #define CONFIG_BOOTCOMMAND \

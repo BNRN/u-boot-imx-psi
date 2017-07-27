@@ -80,9 +80,9 @@
 /* Environment */
 #define CONFIG_ENV_IS_IN_MMC
 #define CONFIG_ENV_OVERWRITE
-#define CONFIG_ENV_SIZE			(64 * 1024)
-#define CONFIG_ENV_OFFSET		(512 * 1024) /* skip enough to make sure we're not writing in the U-boot image (500kb) */
-#define CONFIG_SYS_MMC_ENV_DEV		0
+#define CONFIG_ENV_SIZE                        (64 * 1024)
+#define CONFIG_ENV_OFFSET              (512 * 1024) /* skip enough to make sure we're not writing in the U-boot image (500kb) */
+#define CONFIG_SYS_MMC_ENV_DEV         0
 
 /* Boot */
 #define CONFIG_ZERO_BOOTDELAY_CHECK
@@ -99,10 +99,12 @@
     "image=zImage\0" \
     "bootfile=vmlinuz-default\0" \
 	"fdt_file=verkerk_vipbox-III_san_driver.dtb\0" \
+	"fdt_file_test=verkerk_vipbox-III_default.dtb\0" \
 	"fdt_addr=0x18000000\0" \
 	"fdt_high=0xffffffff\0"	  \
 	"initrd_high=0xffffffff\0" \
 	"rdaddr=0x12A00000\0" \
+	"rdfile_test=uInitrd_test\0" \
     "autostart=no\0" \
     "loadaddr=0x12000000\0" \
 	"console=ttymxc1\0" \
@@ -112,7 +114,11 @@
 	"loadrd=load mmc 0 ${rdaddr} /${rdfile}; setenv rdsize ${filesize}\0" \
 	"loadfdt=echo loading /${fdt_file} ...;  load mmc 0 ${fdt_addr} /${fdt_file}\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk2p2 rootwait rootfstype=ext4\0" \
-    "mmcboot=run update_uenv; run uname_boot;\0" \
+    "testmode=if gpio input 165; then " \
+            "setenv fdt_file ${fdt_file_test};" \
+            "setenv rdfile ${rdfile_test};" \
+        "fi;\0" \
+    "mmcboot=run update_uenv; run testmode; run uname_boot;\0" \
     "update_uenv=echo Checking for: /uEnv.txt ...;" \
 			"if test -e mmc 0 /uEnv.txt; then " \
 				"load mmc 0 ${loadaddr} /uEnv.txt;" \
@@ -130,6 +136,7 @@
                 "echo Checking if uname_r is set in /boot/uEnv.txt...;" \
                 "if test -n ${uname_r}; then " \
                     "setenv bootfile vmlinuz-${uname_r}; " \
+                    "setenv rdfile uInitrd-${uname_r}; " \
                     "echo Using: bootfile=${bootfile} ...;" \
                 "fi;" \
 			"fi;\0" \
@@ -140,7 +147,6 @@
         	"if test -e mmc 0 /${fdt_file}; then " \
 				"run loadfdt;" \
             "fi;" \
-			"setenv rdfile initrd.img-${uname_r}; " \
             "if test -e mmc 0 /${rdfile}; then " \
 				"echo loading /${rdfile} ...; "\
 				"run loadrd;" \
@@ -159,6 +165,7 @@
     "setenv environment_written 1;" \
     "saveenv;" \
     "fi;\0"
+
 
 
 /* Ethernet */

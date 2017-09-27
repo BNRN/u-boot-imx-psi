@@ -16,7 +16,6 @@ make ARCH=arm CROSS_COMPILE=${CC} env
 ./tools/mkimage -n board/psicontrol/hotraco_hrfocus_spl/hotraco_hrfocus.cfg.cfgtmp -T imximage -e 0x00908000 -d spl/u-boot-spl.bin spl.img
 
 # bitmap is 2.5 MB, at offset 2 MB. So I will allocate 5 MB to be sure.
-dd if=/dev/zero count=5 bs=1M | tr '\000' '\377' > hotraco_spl_firmware.bin
-dd if=spl.img of=hotraco_spl_firmware.bin bs=1K seek=1 conv=notrunc && dd if=u-boot.img of=hotraco_spl_firmware.bin bs=1K seek=64 conv=notrunc && dd if=no_sd_1024.bmp of=hotraco_spl_firmware.bin bs=1K conv=notrunc seek=2048
-
+dd if=/dev/zero count=1 bs=1M | tr '\000' '\377' > hotraco_spl_firmware.bin
+dd if=spl.img of=hotraco_spl_firmware.bin bs=1K seek=1 conv=notrunc && dd if=u-boot.img of=hotraco_spl_firmware.bin bs=1K seek=64 conv=notrunc
 #mv u-boot.imx u-boot_hotraco.imx

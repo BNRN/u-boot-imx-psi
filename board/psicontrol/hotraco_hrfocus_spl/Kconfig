@@ -1,0 +1,23 @@
+if TARGET_HOTRACO_HRFOCUS_SPL
+
+config SYS_CPU
+	string
+	default "armv7"
+
+config SYS_BOARD
+	string
+	default "hotraco_hrfocus_spl"
+
+config SYS_VENDOR
+	string
+	default "psicontrol"
+
+config SYS_SOC
+	string
+	default "mx6"
+
+config SYS_CONFIG_NAME
+	string
+	default "hotraco_hrfocus_spl"
+
+endif

@@ -44,7 +44,7 @@ static iomux_v3_cfg_t const uart3_pads[] = {
 };
 
 
-static void petersime_ihmi_spl_setup_uart(void)
+static void hotraco_hrfocus_spl_setup_uart(void)
 {
 	imx_iomux_v3_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads));
 	imx_iomux_v3_setup_multiple_pads(uart2_pads, ARRAY_SIZE(uart2_pads));
@@ -73,8 +73,8 @@ void board_init_f(ulong dummy)
 
 	arch_cpu_init();
 	timer_init();
-	petersime_ihmi_spl_setup_spi();
-	petersime_ihmi_spl_setup_uart();
+	hotraco_hrfocus_spl_setup_spi();
+	hotraco_hrfocus_spl_setup_uart();
 	get_clocks();
 	preloader_console_init();
 

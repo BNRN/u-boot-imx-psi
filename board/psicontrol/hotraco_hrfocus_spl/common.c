@@ -118,7 +118,7 @@ static iomux_v3_cfg_t const ecspi_pads[] = {
 	MX6_PAD_DISP0_DAT0__ECSPI3_SCLK | MUX_PAD_CTRL(SPI_PAD_CTRL),
 };
 
-void petersime_ihmi_spl_setup_spi(void)
+void hotraco_hrfocus_spl_setup_spi(void)
 {
 	SETUP_IOMUX_PADS(ecspi_pads);
 }
@@ -128,7 +128,7 @@ int board_spi_cs_gpio(unsigned bus, unsigned cs)
 	return (bus == 2 && cs == 1) ? (IMX_GPIO_NR(4, 24)) : -1;
 }
 #else
-void petersime_ihmi_spl_setup_spi(void) {}
+void hotraco_hrfocus_spl_setup_spi(void) {}
 #endif
 
 void enable_led(unsigned number, unsigned on_off)

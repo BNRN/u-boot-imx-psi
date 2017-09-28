@@ -8,5 +8,5 @@
 ifdef CONFIG_SPL_BUILD
 obj-y = common.o memory.o spl.o
 else
-obj-y = common.o petersime_ihmi_spl.o
+obj-y = common.o hotraco_hrfocus_spl.o
 endif

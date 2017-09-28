@@ -23,7 +23,7 @@
 
 
 int board_spi_cs_gpio(unsigned bus, unsigned cs);
-void petersime_ihmi_spl_setup_spi(void);
+void hotraco_hrfocus_spl_setup_spi(void);
 
 int board_mmc_init(bd_t *bis);
 int board_mmc_getcd(struct mmc *mmc);

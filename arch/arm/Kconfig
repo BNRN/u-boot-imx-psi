@@ -532,7 +532,10 @@ config TARGET_VERKERK_VIPBOX_III
     
 config TARGET_VERKERK_VIPBOX_III_SPL
 	bool "Support psicontrol VK_VIPBOX board (with SPL)"
-    
+
+config TARGET_HOTRACO_HRFOCUS_SPL
+	bool "Support psicontrol HR_FOCUS board (with SPL)"
+   
 config ARCH_UNIPHIER
 	bool "Panasonic UniPhier platform"
 
@@ -714,5 +717,5 @@ source "board/psicontrol/petersime_ihmi/Kconfig"
 source "board/psicontrol/petersime_ihmi_spl/Kconfig"
 source "board/psicontrol/verkerk_vipbox-III/Kconfig"
 source "board/psicontrol/verkerk_vipbox-III_spl/Kconfig"
-
+source "board/psicontrol/hotraco_hrfocus_spl/Kconfig"
 endmenu

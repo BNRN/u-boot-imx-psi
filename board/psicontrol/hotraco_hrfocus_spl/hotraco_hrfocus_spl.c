@@ -114,21 +114,16 @@ static void setup_usb_otg(void)
 }
 
 static iomux_v3_cfg_t const usb_pwr_pads[] = {
-	/*efkes testen*/	
+	/*efkes testen*/
 	MX6_PAD_EIM_D31__GPIO3_IO31		| MUX_PAD_CTRL(WEAK_PULLUP)
 };
 
 static void setup_usb_pwr(void)
 {
-	/* initialise USB OTG ID line */
- /* struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;*/
+	/* enable usb host power */
 
-	/*clrsetbits_le32(&iomuxc_regs->gpr[1],*/
-			/*IOMUXC_GPR1_OTG_ID_MASK,*/
-			/*IOMUXC_GPR1_OTG_ID_GPIO1);*/
-	printf("trying to enable usb host power ... \n");
+	printf("USB: enabled usb host power \n");
 	imx_iomux_v3_setup_multiple_pads(usb_pwr_pads, ARRAY_SIZE(usb_pwr_pads));
-	printf("light should be on now\n");
 }
 
 #else
@@ -652,9 +647,20 @@ int board_init(void)
 
 int checkboard(void)
 {
-    puts("Board: Hotraco HR Focus (with SPL)\n");
+	puts("Board: Hotraco HR Focus (with SPL)\n");
+  unsigned int gpio;
+	int a = 4;
+while( a < 7 ) {
+	ulong value;
+	gpio = a;
+	gpio_direction_input(gpio);
+	value = gpio_get_value(gpio);
+	printf("GPIO: (gpio %i) value is %lu\n", gpio, value);
+	a++;
+	
+}
 
-	return 0;
+return 0;
 }
 
 int dram_init(void)

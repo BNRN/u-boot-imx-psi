@@ -116,7 +116,7 @@
     "autoload=no\0" \
     "autostart=no\0" \
     "loadaddr=0x12000000\0" \
-    "fdt_addr=11000000\0" \
+    "fdt_addr=0x20000000\0" \
 	"console=ttymxc1\0" \
     "enable_pdp_panel=0\0" \
     "enable_7in_panel=0\0" \

@@ -633,7 +633,7 @@ int board_init(void)
 	hotraco_hrfocus_spl_setup_i2c();
 
 	setup_usb_otg();
-  setup_usb_pwr();
+  	setup_usb_pwr();
 	pfuze_init();
 
 #if defined(CONFIG_VIDEO_IPUV3)
@@ -648,13 +648,15 @@ int board_init(void)
 int checkboard(void)
 {
 	puts("Board: Hotraco HR Focus (with SPL)\n");
-  unsigned int gpio;
+  	
+  	unsigned int gpio;
 	int a = 4;
+
 while( a < 7 ) {
 	ulong value;
 	gpio = a;
-	gpio_direction_input(gpio);
-	value = gpio_get_value(gpio);
+	gpio_direction_input(IMX_GPIO_NR(1,gpio));
+	value = gpio_get_value(IMX_GPIO_NR(1,gpio));
 	printf("GPIO: (gpio %i) value is %lu\n", gpio, value);
 	a++;
 	

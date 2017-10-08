@@ -125,8 +125,9 @@
 	"ethaddr=00:04:9f:00:ea:d4\0" \
 	"fec_addr=00:04:9f:00:ea:d4\0" \
     "serverip=10.0.182.252\0" \
-    "fdt_file_name=hmi_board.dtb\0" \
+    "fdt_file_name=hotraco_hrfocus.dtb\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1\0" \
+    "bootargs_sd=console=ttymxc0,115200 root=/dev/mmcblk2p2 rootwait galcore.gpuProfiler=1\0" \
     "bootargs_usb=console=ttymxc0,115200 root=/dev/sda2 rootwait galcore.gpuProfiler=1\0" \
     "bootargs_7in=console=ttymxc0,115200 root=/dev/mmcblk0p2 rootwait galcore.gpuProfiler=1 video=mxcfb0:dev=ldb,800x480M@61,if=RGB666\0" \
     "bootcmd=run save_env_first_boot; run bootcmd_mmc; run bootcmd_usb; run loadimage_sf;\0" \
@@ -142,7 +143,7 @@
     "fi;\0" \
 	"reflash_uboot=sf probe;" \
 		"sf erase 0x00 +0x600000;" \
-		"tftpboot 0x11000000 petersime_spl_firmware.bin;" \
+		"tftpboot 0x11000000 hotraco_spl_firmware.bin;" \
 		"sf write 0x11000000 0x0 0x600000\0"
 		
 

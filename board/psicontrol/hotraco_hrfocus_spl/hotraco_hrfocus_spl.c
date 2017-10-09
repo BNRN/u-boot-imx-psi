@@ -119,7 +119,7 @@ static iomux_v3_cfg_t const usb_pwr_pads[] = {
 
 static void setup_usb_pwr(void)
 {
-	/* initialise USB Host power enable */
+	/* enable usb host power */
 	imx_iomux_v3_setup_multiple_pads(usb_pwr_pads, ARRAY_SIZE(usb_pwr_pads));
 }
 
@@ -567,9 +567,22 @@ int board_init(void)
 
 int checkboard(void)
 {
-    puts("Board: Hotraco HR Focus (with SPL)\n");
+	puts("Board: Hotraco HR Focus (with SPL)\n");
+  	
+  	unsigned int gpio;
+	int a = 4;
 
-	return 0;
+while( a < 7 ) {
+	ulong value;
+	gpio = a;
+	gpio_direction_input(IMX_GPIO_NR(1,gpio));
+	value = gpio_get_value(IMX_GPIO_NR(1,gpio));
+	printf("GPIO: (gpio %i) value is %lu\n", gpio, value);
+	a++;
+	
+}
+
+return 0;
 }
 
 int dram_init(void)

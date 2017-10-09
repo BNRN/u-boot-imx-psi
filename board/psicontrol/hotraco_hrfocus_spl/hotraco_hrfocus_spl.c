@@ -114,21 +114,13 @@ static void setup_usb_otg(void)
 }
 
 static iomux_v3_cfg_t const usb_pwr_pads[] = {
-	/*efkes testen*/	
 	MX6_PAD_EIM_D31__GPIO3_IO31		| MUX_PAD_CTRL(WEAK_PULLUP)
 };
 
 static void setup_usb_pwr(void)
 {
-	/* initialise USB OTG ID line */
- /* struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;*/
-
-	/*clrsetbits_le32(&iomuxc_regs->gpr[1],*/
-			/*IOMUXC_GPR1_OTG_ID_MASK,*/
-			/*IOMUXC_GPR1_OTG_ID_GPIO1);*/
-	printf("trying to enable usb host power ... \n");
+	/* initialise USB Host power enable */
 	imx_iomux_v3_setup_multiple_pads(usb_pwr_pads, ARRAY_SIZE(usb_pwr_pads));
-	printf("light should be on now\n");
 }
 
 #else
@@ -183,6 +175,41 @@ int board_phy_config(struct phy_device *phydev)
 	return 0;
 }
 
+static iomux_v3_cfg_t const gpio_pads[] = {
+        
+    // BOOT CFG05-06 -> boot from SD or SPI/eMMC
+        MX6_PAD_EIM_DA5__GPIO3_IO05  | MUX_PAD_CTRL(NO_PAD_CTRL),
+        MX6_PAD_EIM_DA6__GPIO3_IO06  | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+
+void setup_gpio_pads(void)
+{
+    SETUP_IOMUX_PADS(gpio_pads);
+}
+
+int do_check_bootmode(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+    gpio_direction_input(IMX_GPIO_NR(3, 6));
+    if (gpio_get_value(IMX_GPIO_NR(3, 6)))
+    {
+        printf("BOOT DEVICE: SD Card\n");
+        setenv("mmc_device", "0");
+        return 0;
+    }
+    else
+    {
+        printf("BOOT DEVICE: eMMC\n");
+        setenv("mmc_device", "1");
+        return 1;
+    }
+}
+
+U_BOOT_CMD(
+	check_bootmode, 1, 1, do_check_bootmode,
+	"Read the boot config mode and set the boot device accordingly",
+	""
+);
+
 int board_eth_init(bd_t *bis)
 {
 	uint32_t base = IMX_FEC_BASE;
@@ -192,22 +219,6 @@ int board_eth_init(bd_t *bis)
 	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
 
 	setup_iomux_enet();
-
-	// ENKEL VOOR OMGEBOUWDE BOARDS
-    char* enable_enet_clk_env = getenv("enable_enet_clk");
-	if (NULL != enable_enet_clk_env && 0 == strcmp(enable_enet_clk_env, "1"))
-    {
-        printf("Enabling i.MX6 Ethernet clock\n");
-
-        // enable enet clock gating (on for all power modes)
-        enable_enet_clk(1);
-
-        // set PLL at 50 MHz
-        enable_fec_anatop_clock(ENET_50MHz);
-
-        // enable PLL (set gpr1[ENET_CLK_SEL])
-        setbits_le32(&iomuxc_regs->gpr[1], IOMUXC_GPR1_ENET_CLK_SEL_MASK);
-    }
 
 	bus = fec_get_miibus(base, -1);
 	if (!bus)
@@ -309,7 +320,7 @@ struct display_info_t const displays[] = {{
 	.detect	= NULL,
 	.enable	= enable_lvds,
 	.mode	= {
-		.name           = "Texim Chefree CH121ILGL",
+		.name           = "Texim Chefree CH104ILGL",
 		.refresh        = 60,
 		.xres           = 1024,
 		.yres           = 768,
@@ -362,106 +373,6 @@ struct display_info_t const displays[] = {{
 		.vsync_len      = 22,
 		.sync           = FB_SYNC_EXT,
 		.vmode          = FB_VMODE_NONINTERLACED
-/*} }, {
-	.bus	= 2,
-	.addr	= 0x4,
-	.pixfmt	= IPU_PIX_FMT_LVDS666,
-	.detect	= detect_i2c,
-	.enable	= enable_lvds,
-	.mode	= {
-		.name           = "Hannstar-XGA",
-		.refresh        = 60,
-		.xres           = 1024,
-		.yres           = 768,
-		.pixclock       = 15385,
-		.left_margin    = 220,
-		.right_margin   = 40,
-		.upper_margin   = 21,
-		.lower_margin   = 7,
-		.hsync_len      = 60,
-		.vsync_len      = 10,
-		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 0,
-	.addr	= 0,
-	.pixfmt	= IPU_PIX_FMT_LVDS666,
-	.detect	= NULL,
-	.enable	= enable_lvds,
-	.mode	= {
-		.name           = "LG-9.7",
-		.refresh        = 60,
-		.xres           = 1024,
-		.yres           = 768,
-		.pixclock       = 15385,
-		.left_margin    = 480,
-		.right_margin   = 260,
-		.upper_margin   = 16,
-		.lower_margin   = 6,
-		.hsync_len      = 250,
-		.vsync_len      = 10,
-		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 2,
-	.addr	= 0x38,
-	.pixfmt	= IPU_PIX_FMT_LVDS666,
-	.detect	= detect_i2c,
-	.enable	= enable_lvds,
-	.mode	= {
-		.name           = "wsvga-lvds",
-		.refresh        = 60,
-		.xres           = 1024,
-		.yres           = 600,
-		.pixclock       = 15385,
-		.left_margin    = 220,
-		.right_margin   = 40,
-		.upper_margin   = 21,
-		.lower_margin   = 7,
-		.hsync_len      = 60,
-		.vsync_len      = 10,
-		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 2,
-	.addr	= 0x41,
-	.pixfmt	= IPU_PIX_FMT_LVDS666,
-	.detect	= detect_i2c,
-	.enable	= enable_lvds,
-	.mode	= {
-		.name           = "amp1024x600",
-		.refresh        = 60,
-		.xres           = 1024,
-		.yres           = 600,
-		.pixclock       = 15385,
-		.left_margin    = 220,
-		.right_margin   = 40,
-		.upper_margin   = 21,
-		.lower_margin   = 7,
-		.hsync_len      = 60,
-		.vsync_len      = 10,
-		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED
-} }, {
-	.bus	= 0,
-	.addr	= 0,
-	.pixfmt	= IPU_PIX_FMT_LVDS666,
-	.detect	= 0,
-	.enable	= enable_lvds,
-	.mode	= {
-		.name           = "wvga-lvds",
-		.refresh        = 57,
-		.xres           = 800,
-		.yres           = 480,
-		.pixclock       = 15385,
-		.left_margin    = 220,
-		.right_margin   = 40,
-		.upper_margin   = 21,
-		.lower_margin   = 7,
-		.hsync_len      = 60,
-		.vsync_len      = 10,
-		.sync           = FB_SYNC_EXT,
-		.vmode          = FB_VMODE_NONINTERLACED*/
 } } };
 size_t display_count = ARRAY_SIZE(displays);
 
@@ -487,6 +398,8 @@ int board_late_init(void)
 		udelay(15000);
 		gpio_direction_output(LVDS_BACKLIGHT_GP, 1);
 	}
+    
+    do_check_bootmode(NULL, 0, 0, NULL);
 
 	return 0;
 }
@@ -565,8 +478,8 @@ static void setup_display(void)
     }
     else
     {
-        /* Chefree is 20 KHz */
-        pwm_config(LVDS_BACKLIGHT_PWM, 40000, 50000);
+        /* Chefree is 500 Hz */
+        pwm_config(LVDS_BACKLIGHT_PWM, 1600000, 2000000);
     }
 }
 
@@ -638,8 +551,10 @@ int board_init(void)
 	hotraco_hrfocus_spl_setup_i2c();
 
 	setup_usb_otg();
-  setup_usb_pwr();
+    setup_usb_pwr();
 	pfuze_init();
+    
+    setup_gpio_pads();
 
 #if defined(CONFIG_VIDEO_IPUV3)
 	setup_display();

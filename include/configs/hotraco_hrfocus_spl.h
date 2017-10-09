@@ -100,7 +100,7 @@
 #define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
 #define CONFIG_ENV_SECT_SIZE		(64 * 1024)
 #define CONFIG_ENV_SIZE			(64 * 1024)
-#define CONFIG_ENV_OFFSET		(8128 * 1024)
+#define CONFIG_ENV_OFFSET		(960 * 1024)
 
 /* Boot */
 #define CONFIG_ZERO_BOOTDELAY_CHECK
@@ -129,7 +129,7 @@
     "bootargs_emmc=console=ttymxc0,115200 root=/dev/mmcblk3p2 rootwait\0" \
     "bootargs_mmc=console=ttymxc0,115200 root=/dev/mmcblk2p2 rootwait\0" \
     "bootargs_usb=console=ttymxc0,115200 root=/dev/sda2 rootwait\0" \
-    "bootargs=${bootargs_emmc}\0" \
+    "bootargs=console=ttymxc0,115200 root=/dev/mmcblk3p2 rootwait\0" \
     "bootcmd=run save_env_first_boot; run check_boot_device; run bootcmd_mmc;\0" \
     "image=petersime.bmp\0" \
     "loadimage_mmc=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \

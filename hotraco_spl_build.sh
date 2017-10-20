@@ -1,5 +1,5 @@
 #!/bin/bash
-export CC=/opt/gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux/bin/arm-linux-gnueabihf-
+export CC=/opt/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 
 export PRODUCT_ID_NUMBER=17065  #<product_id_number>
 export PRODUCT_VERSION_NUMBER=0      #<product_version_number>

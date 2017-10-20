@@ -210,6 +210,44 @@ U_BOOT_CMD(
 	""
 );
 
+int check_hotraco_id(void)
+{
+
+  	
+  	unsigned int gpio;
+  	ulong hotraco_id[3];
+	int i = 4;
+
+	while( i < 7 ) 
+	{
+	ulong value;
+	gpio = i;
+	gpio_direction_input(IMX_GPIO_NR(1,gpio));
+	value = gpio_get_value(IMX_GPIO_NR(1,gpio));
+	 /** printf("GPIO: (gpio %i) value is %lu\n", gpio, value);*/
+	i++;
+	hotraco_id[gpio - 4] = value ; 
+	}
+
+	printf("ID: ");
+	printf("%lu:", hotraco_id[0]);
+	printf("%lu:", hotraco_id[1]);
+	printf("%lu\n", hotraco_id[2]);
+	setenv("ho_id", hotraco_id);
+
+
+
+
+return 0;
+
+}
+
+U_BOOT_CMD(
+	check_id,1,0, check_hotraco_id,
+	"Read the 3 GPIO pins for hotraco_id",
+	""
+);
+
 int board_eth_init(bd_t *bis)
 {
 	uint32_t base = IMX_FEC_BASE;
@@ -528,6 +566,8 @@ static int change_backlight_enable(cmd_tbl_t *cmdtp, int flag, int argc, char * 
 }
 
 
+
+
 U_BOOT_CMD(
 	blpwm, 3, 1, change_backlight_pwm,
 	"Configure the backlight pwm: blpwm duty_cycle_in_ns clock_period_in_ns",
@@ -569,20 +609,8 @@ int checkboard(void)
 {
 	puts("Board: Hotraco HR Focus (with SPL)\n");
   	
-  	unsigned int gpio;
-	int a = 4;
+  	return 0;
 
-while( a < 7 ) {
-	ulong value;
-	gpio = a;
-	gpio_direction_input(IMX_GPIO_NR(1,gpio));
-	value = gpio_get_value(IMX_GPIO_NR(1,gpio));
-	printf("GPIO: (gpio %i) value is %lu\n", gpio, value);
-	a++;
-	
-}
-
-return 0;
 }
 
 int dram_init(void)

@@ -114,6 +114,8 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
     "autoload=no\0" \
+    "hotraco_id=1:1:1\0" \
+    "aaaaa=888\0" \
     "autostart=no\0" \
     "loadaddr=0x12000000\0" \
     "fdt_addr=0x20000000\0" \
@@ -131,7 +133,7 @@
     "bootargs_usb=console=ttymxc0,115200 root=/dev/sda2 rootwait\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk3p2 rootwait\0" \
     "bootcmd=run save_env_first_boot; run check_boot_device; run bootcmd_mmc;\0" \
-    "image=petersime.bmp\0" \
+    "image=\0" \
     "loadimage_mmc=fatload mmc 0 11000000 ${image}; bmp disp 11000000\0" \
     "bootcmd_mmc=fatload mmc ${mmc_device} ${fdt_addr} /${fdt_file_name};fatload mmc ${mmc_device} ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \
     "bootcmd_usb=usb start;setenv bootargs ${bootargs_usb};fatload usb 0:1 ${fdt_addr} /${fdt_file_name};fatload usb 0:1 ${loadaddr} /uImage;bootm ${loadaddr} - ${fdt_addr};\0" \

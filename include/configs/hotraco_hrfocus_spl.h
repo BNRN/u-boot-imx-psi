@@ -114,8 +114,6 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
     "autoload=no\0" \
-    "hotraco_id=1:1:1\0" \
-    "aaaaa=888\0" \
     "autostart=no\0" \
     "loadaddr=0x12000000\0" \
     "fdt_addr=0x20000000\0" \
@@ -149,6 +147,7 @@
 		"sf erase 0x00 +0x600000;" \
 		"tftpboot 0x11000000 hotraco_spl_firmware.bin;" \
 		"sf write 0x11000000 0x0 0x600000\0"
+
 		
 
 #define CONFIG_BOOTCOMMAND \

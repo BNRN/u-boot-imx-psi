@@ -210,40 +210,51 @@ U_BOOT_CMD(
 	""
 );
 
-int check_hotraco_id(void)
+int check_hotraco_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
+	gpio_direction_input(IMX_GPIO_NR(1, 4));
+	if (gpio_get_value(IMX_GPIO_NR(1, 4)) == 0)
+    {
+        
+        setenv("idPin1", "0");
+        puts("done");
+    }
+    else
+    {
+        setenv("idPin1", "1");
+        
+    }
 
-  	
-  	unsigned int gpio;
-  	ulong hotraco_id[3];
-	int i = 4;
+    gpio_direction_input(IMX_GPIO_NR(1, 5));
+    if (gpio_get_value(IMX_GPIO_NR(1, 5)) == 0)
+    {
+        
+        setenv("idPin2", "0");
+        puts("done");
+    }
+    else
+    {
+        setenv("idPin2", "1");
+       
+    }
 
-	while( i < 7 ) 
-	{
-	ulong value;
-	gpio = i;
-	gpio_direction_input(IMX_GPIO_NR(1,gpio));
-	value = gpio_get_value(IMX_GPIO_NR(1,gpio));
-	 /** printf("GPIO: (gpio %i) value is %lu\n", gpio, value);*/
-	i++;
-	hotraco_id[gpio - 4] = value ; 
-	}
-
-	printf("ID: ");
-	printf("%lu:", hotraco_id[0]);
-	printf("%lu:", hotraco_id[1]);
-	printf("%lu\n", hotraco_id[2]);
-	setenv("ho_id", hotraco_id);
-
-
-
-
-return 0;
+    gpio_direction_input(IMX_GPIO_NR(1, 6));
+    if (gpio_get_value(IMX_GPIO_NR(1, 6)) == 0)
+    {
+        
+        setenv("idPin3", "0");
+        puts("done");
+    }
+    else
+    {
+        setenv("idPin3", "1");
+        
+    }
 
 }
 
 U_BOOT_CMD(
-	check_id,1,0, check_hotraco_id,
+	check_id,1,1, check_hotraco_id,
 	"Read the 3 GPIO pins for hotraco_id",
 	""
 );

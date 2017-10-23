@@ -127,6 +127,7 @@
     "fdt_file_name=hotraco_hrfocus.dtb\0" \
     "mmc_device=1\0" \
     "bootargs_emmc=console=ttymxc0,115200 root=/dev/mmcblk3p2 rootwait\0" \
+    "bootargs_hotraco=console=ttymxc0,115200 root=/dev/mmcblk3p2 rootwait id=${idPin1}${idPin2}${idPin3}\0" \
     "bootargs_mmc=console=ttymxc0,115200 root=/dev/mmcblk2p2 rootwait\0" \
     "bootargs_usb=console=ttymxc0,115200 root=/dev/sda2 rootwait\0" \
     "bootargs=console=ttymxc0,115200 root=/dev/mmcblk3p2 rootwait\0" \

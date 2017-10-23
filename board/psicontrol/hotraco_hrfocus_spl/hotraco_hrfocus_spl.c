@@ -212,45 +212,36 @@ U_BOOT_CMD(
 
 int check_hotraco_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
+	printf("reading id pins (gpio 4,5,6) ...\n");
 	gpio_direction_input(IMX_GPIO_NR(1, 4));
 	if (gpio_get_value(IMX_GPIO_NR(1, 4)) == 0)
-    {
-        
+    {        
         setenv("idPin1", "0");
-        puts("done");
     }
     else
     {
-        setenv("idPin1", "1");
-        
+        setenv("idPin1", "1");        
     }
 
     gpio_direction_input(IMX_GPIO_NR(1, 5));
     if (gpio_get_value(IMX_GPIO_NR(1, 5)) == 0)
-    {
-        
+    {        
         setenv("idPin2", "0");
-        puts("done");
     }
     else
     {
         setenv("idPin2", "1");
-       
     }
 
     gpio_direction_input(IMX_GPIO_NR(1, 6));
     if (gpio_get_value(IMX_GPIO_NR(1, 6)) == 0)
     {
-        
         setenv("idPin3", "0");
-        puts("done");
     }
     else
     {
         setenv("idPin3", "1");
-        
     }
-
 }
 
 U_BOOT_CMD(

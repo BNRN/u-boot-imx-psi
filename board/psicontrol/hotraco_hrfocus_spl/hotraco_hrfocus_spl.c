@@ -242,6 +242,7 @@ int check_hotraco_id(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     {
         setenv("idPin3", "1");
     }
+    return 0;
 }
 
 U_BOOT_CMD(
@@ -256,7 +257,7 @@ int board_eth_init(bd_t *bis)
 	struct mii_dev *bus = NULL;
 	struct phy_device *phydev = NULL;
 	int ret;
-	struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;
+	/*struct iomuxc *const iomuxc_regs = (struct iomuxc *)IOMUXC_BASE_ADDR;*/
 
 	setup_iomux_enet();
 

@@ -19,7 +19,7 @@
 #include <i2c.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
-#include "common.h"
+#include "../common/common.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -73,14 +73,14 @@ static struct i2c_pads_info i2c_pad_info2 = {
 };	
 		
 
-static void petersime_ihmi_spl_setup_i2c(void)
+static void ihmi_spl_setup_i2c(void)
 {
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info0); // RTC , eeprom
 	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1); // PMIC
 	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info2); // testpad
 }
 #else
-static void petersime_ihmi_spl_setup_i2c(void) { }
+static void ihmi_spl_setup_i2c(void) { }
 #endif
 
 #ifdef CONFIG_USB_EHCI_MX6
@@ -614,9 +614,9 @@ int board_init(void)
 	/* address of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 	
-	petersime_ihmi_spl_setup_spi();
+	ihmi_spl_setup_spi();
 
-	petersime_ihmi_spl_setup_i2c();
+	ihmi_spl_setup_i2c();
 	
 	setup_usb_otg();
 	

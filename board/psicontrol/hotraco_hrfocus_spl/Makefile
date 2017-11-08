@@ -4,9 +4,12 @@
 # Authors: Nikita Kiryanov <nikita@compulab.co.il>
 #
 # SPDX-License-Identifier:	GPL-2.0+
+COMMON_DIR=../common
+ccflags-y +=-I${COMMON_DIR}
+
 #
 ifdef CONFIG_SPL_BUILD
-obj-y = common.o memory.o spl.o
+obj-y = ${COMMON_DIR}/common.o ${COMMON_DIR}/memory.o ${COMMON_DIR}/spl.o
 else
-obj-y = common.o hotraco_hrfocus_spl.o
+obj-y = ${COMMON_DIR}/common.o hotraco_hrfocus_spl.o
 endif
